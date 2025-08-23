@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
           await storeGoogleTokens({
             userId: user.id,
             accessToken: googleTokens,
-            refreshToken: googleRefreshToken,
+            refreshToken: googleRefreshToken || undefined,
             expiresAt: session.expires_at,
             scope: "https://www.googleapis.com/auth/calendar",
           });

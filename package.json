@@ -7,7 +7,7 @@
     "build": "next build",
     "dev": "next dev",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "next lint --fix",
     "type-check": "tsc --noEmit",
     "supabase:types": "supabase gen types typescript --local > types/database.types.ts"
   },
