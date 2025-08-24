@@ -38,6 +38,7 @@ export async function POST(request: NextRequest) {
 
     const body = await request.json()
     const { emails, duration, daysToCheck } = availabilitySchema.parse(body)
+    const timezone = body?.timezone || 'UTC'
 
     // Include current user's email and de-duplicate participants
     const allEmails = Array.from(new Set([...emails, user.email].map((e) => e.toLowerCase())))
@@ -150,7 +151,7 @@ export async function POST(request: NextRequest) {
       duration,
       daysChecked: daysToCheck,
       suggestedTeammates: [],
-      ...(debug ? { debug: { who: user.email, participants: allEmails } } : {}),
+      ...(debug ? { debug: { who: user.email, participants: allEmails, timezone, busyMap } } : {}),
     })
   } catch (error) {
     console.error("Error checking availability:", error)

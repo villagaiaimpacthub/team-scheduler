@@ -44,7 +44,8 @@ export function AvailabilityChecker({ selectedEmails, onSlotsFound, onSuggestion
         body: JSON.stringify({
           emails: selectedEmails,
           duration,
-          daysToCheck
+          daysToCheck,
+          timezone: Intl.DateTimeFormat().resolvedOptions().timeZone
         }),
       })
 
