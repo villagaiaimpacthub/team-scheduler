@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { TeamMemberSelector } from './TeamMemberSelector'
+import { EmailTeamBuilder } from './EmailTeamBuilder'
 import { AvailabilityChecker } from './AvailabilityChecker'
 import { TimeSlotSelector } from './TimeSlotSelector'
 import { Button } from './ui/Button'
@@ -31,6 +32,7 @@ export function TeamScheduler() {
   const [booking, setBooking] = useState(false)
   const [bookingResult, setBookingResult] = useState<BookingResult | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [manualEmails, setManualEmails] = useState<string[]>([])
 
   const handleBooking = async (slot: TimeSlot, title: string, description?: string) => {
     try {
@@ -132,9 +134,15 @@ export function TeamScheduler() {
             selectedEmails={selectedEmails}
             onSelectionChange={setSelectedEmails}
           />
+          <EmailTeamBuilder
+            domain={process.env.NEXT_PUBLIC_COMPANY_DOMAIN as any}
+            members={manualEmails}
+            onAdd={(email) => setManualEmails((prev) => Array.from(new Set([...prev, email])))}
+            onRemove={(email) => setManualEmails((prev) => prev.filter((e) => e !== email))}
+          />
           
           <AvailabilityChecker
-            selectedEmails={selectedEmails}
+            selectedEmails={[...new Set([...selectedEmails, ...manualEmails])]}
             onSlotsFound={(slots) => {
               setAvailableSlots(slots)
               setError(null)
