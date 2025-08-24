@@ -1,4 +1,5 @@
-import { findAvailableSlots, getCalendarService } from "@/lib/google-calendar"
+import { getCalendarServiceWithToken, findAvailableSlotsWithService } from "@/lib/google-calendar"
+import { createClient } from "@supabase/supabase-js"
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { createServerClient } from "@supabase/ssr"
@@ -29,6 +30,7 @@ export async function POST(request: NextRequest) {
       }
     )
 
+    const debug = request.nextUrl.searchParams.get('debug') === '1'
     const { data: { user } } = await supabase.auth.getUser()
     if (!user?.email) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
@@ -40,15 +42,47 @@ export async function POST(request: NextRequest) {
     // Include current user's email in the check
     const allEmails = [...emails, user.email]
 
-    // Find available slots
-    const slots = await findAvailableSlots({
-      emails: allEmails,
-      duration,
-      daysToCheck,
-    })
+    // Use a plain service-role client to reliably read the current user's token
+    const admin = createClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { persistSession: false } }
+    )
+    const { data: selfToken, error: selfTokErr } = await admin
+      .from('google_tokens')
+      .select('access_token, expires_at')
+      .eq('user_id', (user as any).id)
+      .single()
+    if (selfTokErr || !selfToken?.access_token) {
+      return NextResponse.json({
+        error: 'No Google Calendar access',
+        hint: 'Please sign in with Google and grant Calendar permissions. Then retry.',
+        who: user.email,
+        ...(debug ? { details: selfTokErr?.message || 'no token for current user' } : {}),
+      }, { status: 403 })
+    }
+    const service = getCalendarServiceWithToken(selfToken.access_token)
+
+    // Find available slots using the service
+    let slots
+    try {
+      slots = await findAvailableSlotsWithService({
+        calendarService: service,
+        emails: allEmails,
+        duration,
+        daysToCheck,
+      })
+    } catch (e: any) {
+      return NextResponse.json({
+        error: 'Calendar free/busy failed',
+        hint: 'Verify Calendar API enabled and that selected users granted access or domain free/busy is visible.',
+        who: user.email,
+        ...(debug ? { details: String(e?.message || e) } : {}),
+      }, { status: 502 })
+    }
 
     // Just-in-time discovery from current events within the window
-    const calendarService = await getCalendarService()
+    const calendarService = service
     const now = new Date()
     const endDate = new Date(now.getTime() + daysToCheck * 24 * 60 * 60 * 1000)
     const events = calendarService
@@ -74,6 +108,7 @@ export async function POST(request: NextRequest) {
       duration,
       daysChecked: daysToCheck,
       suggestedTeammates: Array.from(discoveredSet),
+      ...(debug ? { debug: { who: user.email, participants: allEmails } } : {}),
     })
   } catch (error) {
     console.error("Error checking availability:", error)

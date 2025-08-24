@@ -183,6 +183,11 @@ export async function getCalendarService(): Promise<GoogleCalendarService | null
   return new GoogleCalendarService(accessToken);
 }
 
+// Create a service from a provided access token (bypasses session helpers)
+export function getCalendarServiceWithToken(accessToken: string): GoogleCalendarService {
+  return new GoogleCalendarService(accessToken);
+}
+
 /**
  * Find available time slots for multiple users
  */
@@ -274,6 +279,77 @@ export async function findAvailableSlots({
           if (slots.length >= 10) {
             return slots;
           }
+        }
+      }
+    }
+  }
+
+  return slots;
+}
+
+// Same as findAvailableSlots but reuses a provided service
+export async function findAvailableSlotsWithService({
+  calendarService,
+  emails,
+  duration = 30,
+  daysToCheck = 7,
+  businessHours = { start: 9, end: 17 },
+}: {
+  calendarService: GoogleCalendarService;
+  emails: string[];
+  duration?: number;
+  daysToCheck?: number;
+  businessHours?: { start: number; end: number };
+}): Promise<Array<{ start: string; end: string }>> {
+  // Calculate date range
+  const now = new Date();
+  const endDate = new Date(now.getTime() + daysToCheck * 24 * 60 * 60 * 1000);
+
+  // Get busy times for all users
+  const busyTimes = await calendarService.getFreeBusyInfo(now.toISOString(), endDate.toISOString(), emails);
+
+  // Find free slots
+  const slots: Array<{ start: string; end: string }> = [];
+  const slotDurationMs = duration * 60 * 1000;
+
+  for (let d = 0; d < daysToCheck; d++) {
+    const checkDate = new Date(now);
+    checkDate.setDate(checkDate.getDate() + d);
+
+    if (checkDate.getDay() === 0 || checkDate.getDay() === 6) {
+      continue;
+    }
+
+    for (let hour = businessHours.start; hour < businessHours.end; hour++) {
+      for (let minute = 0; minute < 60; minute += 30) {
+        const slotStart = new Date(checkDate);
+        slotStart.setHours(hour, minute, 0, 0);
+        const slotEnd = new Date(slotStart.getTime() + slotDurationMs);
+
+        if (slotStart < now) continue;
+        if (slotEnd.getHours() >= businessHours.end) break;
+
+        let isAvailable = true;
+        for (const email of emails) {
+          const userBusyTimes = busyTimes[email] || [];
+          for (const busy of userBusyTimes) {
+            const busyStart = new Date(busy.start);
+            const busyEnd = new Date(busy.end);
+            if (
+              (slotStart >= busyStart && slotStart < busyEnd) ||
+              (slotEnd > busyStart && slotEnd <= busyEnd) ||
+              (slotStart <= busyStart && slotEnd >= busyEnd)
+            ) {
+              isAvailable = false;
+              break;
+            }
+          }
+          if (!isAvailable) break;
+        }
+
+        if (isAvailable) {
+          slots.push({ start: slotStart.toISOString(), end: slotEnd.toISOString() });
+          if (slots.length >= 10) return slots;
         }
       }
     }
