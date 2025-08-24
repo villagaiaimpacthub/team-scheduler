@@ -1,15 +1,21 @@
 import { getServerSession, getTeamMembers } from "@/lib/auth-supabase";
+import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const session = await getServerSession();
+    const debug = request.nextUrl.searchParams.get('debug') === '1'
+    const cookieStore = await cookies()
+    const cookieKeys = cookieStore.getAll().map((c) => c.name).filter((n) => n.startsWith('sb-'))
 
     if (!session?.user?.email) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+      const body: any = { error: "Not authenticated" }
+      if (debug) body.debug = { cookieKeys, note: 'No session user email' }
+      return NextResponse.json(body, { status: 401 });
     }
 
     // Get team members using the utility function
@@ -33,6 +39,7 @@ export async function GET() {
         domain: session.user.domain,
       },
       companyDomain,
+      ...(debug ? { debug: { cookieKeys } } : {}),
     });
   } catch (error) {
     console.error("Error fetching team members:", error);
