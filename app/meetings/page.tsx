@@ -2,6 +2,7 @@
 
 import { MeetingsList } from './MeetingsList'
 import { GoogleCalendarView } from '@/components/GoogleCalendarView'
+import { MeetingsMonth } from '@/components/MeetingsMonth'
 import { useAuth } from '../providers'
 import { useRouter } from 'next/navigation'
 import { useEffect, useState } from 'react'
@@ -38,7 +39,7 @@ export default function MeetingsPage() {
       </div>
       
       <div className="mb-6">
-        <GoogleCalendarView onEventSelect={setSelectedEvent} />
+        <MeetingsMonth />
       </div>
       {selectedEvent ? (
         <Card>
