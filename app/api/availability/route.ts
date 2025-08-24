@@ -39,8 +39,8 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
     const { emails, duration, daysToCheck } = availabilitySchema.parse(body)
 
-    // Include current user's email in the check
-    const allEmails = [...emails, user.email]
+    // Include current user's email and de-duplicate participants
+    const allEmails = Array.from(new Set([...emails, user.email].map((e) => e.toLowerCase())))
 
     // Use a plain service-role client to reliably read the current user's token
     const admin = createClient<Database>(
