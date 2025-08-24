@@ -29,7 +29,11 @@ export function TeamMemberSelector({ selectedEmails, onSelectionChange }: TeamMe
   const fetchTeammates = async () => {
     try {
       setLoading(true)
-      const response = await fetch('/api/team-members')
+      const response = await fetch('/api/team-members', {
+        method: 'GET',
+        credentials: 'include',
+        cache: 'no-store',
+      })
       
       if (!response.ok) {
         throw new Error('Failed to fetch team members')

@@ -51,8 +51,10 @@ export async function GET(request: NextRequest) {
         console.error('Upsert users row failed', e);
       }
 
-      // Redirect to home page
-      return NextResponse.redirect(`${origin}/`);
+      // Redirect to home page with set-cookie preserved
+      const res = NextResponse.redirect(`${origin}/`)
+      // pass through cookies already set via supabase SSR helpers
+      return res
     }
   }
 
