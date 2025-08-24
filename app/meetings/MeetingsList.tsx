@@ -35,7 +35,10 @@ export function MeetingsList() {
   const fetchMeetings = async () => {
     try {
       setLoading(true)
-      const response = await fetch('/api/meetings')
+      const response = await fetch('/api/meetings', {
+        credentials: 'include',
+        cache: 'no-store'
+      })
       
       if (!response.ok) {
         throw new Error('Failed to fetch meetings')
