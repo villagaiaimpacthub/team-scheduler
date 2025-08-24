@@ -22,11 +22,12 @@ export function Navigation() {
               <span className="text-xl font-bold text-[var(--foreground)]">Team Scheduler</span>
             </Link>
             
-            <div className="ml-10 flex items-baseline space-x-4">
+            <div className="ml-10 flex items-center space-x-4">
               <Link
                 href="/"
-                className="text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-3 py-2 rounded-md text-sm font-medium"
+                className="text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1"
               >
+                <Icon name="Clock" className="h-4 w-4" />
                 Schedule
               </Link>
               <Link

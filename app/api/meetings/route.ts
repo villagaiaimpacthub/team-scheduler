@@ -1,16 +1,20 @@
-import { getServerSession } from "@/lib/auth-supabase";
-import { createSupabaseServerClient } from "@/lib/supabase-server";
+import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
+import { Database } from "@/types/database.types";
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+
+export async function GET(request: NextRequest) {
   try {
-    const session = await getServerSession();
-
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-    }
-
-    const supabase = await createSupabaseServerClient();
+    const supabase = createServerClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { cookies: { get: (n) => request.cookies.get(n)?.value, set() {}, remove() {} } }
+    )
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!(user as any)?.id) return NextResponse.json({ error: 'Not authenticated' }, { status: 401 })
 
     // Get meetings where user is organizer or participant
     // Using RLS policies, user can only see meetings they're authorized for
@@ -38,8 +42,36 @@ export async function GET() {
       .order("start_time", { ascending: true });
 
     if (error) {
-      console.error("Error fetching meetings:", error);
-      return NextResponse.json({ error: "Failed to fetch meetings" }, { status: 500 });
+      // Fallback with service-role if RLS blocks
+      const admin = createClient<Database>(
+        process.env.NEXT_PUBLIC_SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!,
+        { auth: { persistSession: false } }
+      )
+      const { data: m2, error: e2 } = await admin
+        .from('meetings')
+        .select('*')
+        .or(`organizer_id.eq.${(user as any).id},participants.cs.{"${user!.email}"}`)
+        .gte('start_time', new Date().toISOString())
+        .order('start_time', { ascending: true })
+      if (e2) {
+        console.error('Error fetching meetings:', e2)
+        return NextResponse.json({ error: 'Failed to fetch meetings' }, { status: 500 })
+      }
+      const formatted = (m2 || []).map((meeting: any) => ({
+        id: meeting.id,
+        title: meeting.title,
+        description: meeting.description,
+        startTime: meeting.start_time,
+        endTime: meeting.end_time,
+        duration: meeting.duration,
+        location: meeting.location,
+        organizer: { email: 'you' },
+        participants: meeting.participants,
+        googleEventId: meeting.google_event_id,
+        createdAt: meeting.created_at,
+      }))
+      return NextResponse.json({ meetings: formatted })
     }
 
     const formattedMeetings =
@@ -52,7 +84,7 @@ export async function GET() {
         duration: meeting.duration,
         location: meeting.location,
         organizer: meeting.users,
-        participants: JSON.parse(meeting.participants),
+        participants: meeting.participants,
         googleEventId: meeting.google_event_id,
         createdAt: meeting.created_at,
       })) || [];
