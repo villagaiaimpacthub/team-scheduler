@@ -15,8 +15,8 @@ export async function middleware(request: NextRequest) {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
   const csp = [
     `default-src 'self'`,
-    // Only trust scripts with this nonce; allow dynamic child scripts from trusted ones
-    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
+    // Allow Next inline bootstrap via 'unsafe-inline' and nonce; strict-dynamic for child scripts
+    `script-src 'self' 'nonce-${nonce}' 'unsafe-inline' 'strict-dynamic' https://accounts.google.com https://www.gstatic.com https://apis.google.com`,
     // Styles (Tailwind injects styles via CSS files; allow inline for safety)
     `style-src 'self' 'unsafe-inline'`,
     // Images/fonts may load from CDNs
