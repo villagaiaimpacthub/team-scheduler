@@ -77,11 +77,13 @@ export async function POST(request: NextRequest) {
     console.log("Calendar event created:", calendarEvent.id);
 
     // Store meeting in database using Supabase
-    const { data: meeting, error: meetingError } = await (createServerClient<Database>(
+    // Insert using service-role (bypass RLS recursion on users policies)
+    const adminDb = createClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-      { cookies: { get: (n) => request.cookies.get(n)?.value, set() {}, remove() {} } }
-    ))
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { persistSession: false } }
+    )
+    const { data: meeting, error: meetingError } = await adminDb
       .from("meetings")
       .insert({
         title,
