@@ -22,6 +22,11 @@ export function GoogleCalendarView({ onEventSelect }: { onEventSelect?: (event: 
   const [view] = useState<'dayGridMonth'>('dayGridMonth')
   const calendarRef = useRef<FullCalendar | null>(null)
   const [tooltip, setTooltip] = useState<{ x: number; y: number; title: string; time: string } | null>(null)
+  const monthTitle = useMemo(() => {
+    if (!range?.start) return ''
+    const d = new Date(range.start)
+    return d.toLocaleString(undefined, { month: 'long', year: 'numeric' })
+  }, [range?.start])
 
   useEffect(() => {
     if (!range) return
@@ -64,7 +69,7 @@ export function GoogleCalendarView({ onEventSelect }: { onEventSelect?: (event: 
 
   return (
     <Card className="space-y-3">
-      <div className="flex items-center justify-between">
+      <div className="grid grid-cols-3 items-center">
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={onPrev}>
             <Icon name="ChevronLeft" className="h-4 w-4" />
@@ -76,11 +81,8 @@ export function GoogleCalendarView({ onEventSelect }: { onEventSelect?: (event: 
             <Icon name="Calendar" className="h-4 w-4 mr-1" /> Today
           </Button>
         </div>
-        <div>
-          <Button variant="outline" size="sm" onClick={onMonth} aria-label="Switch to month view">
-            Month
-          </Button>
-        </div>
+        <div className="text-center text-base font-semibold tracking-tight">{monthTitle}</div>
+        <div className="flex justify-end"><Button variant="outline" size="sm" onClick={onMonth} aria-label="Switch to month view">Month</Button></div>
       </div>
 
       <div className="relative rounded-md border border-[color:var(--border)]">
@@ -119,9 +121,7 @@ export function GoogleCalendarView({ onEventSelect }: { onEventSelect?: (event: 
             el.style.color = 'var(--primary-foreground)'
             el.style.border = 'none'
           }}
-          slotDuration="00:30:00"
-          slotLabelFormat={{ hour: 'numeric', minute: '2-digit', meridiem: true }}
-          allDaySlot={false}
+          
           eventContent={(arg) => {
             const timeText = arg.timeText
             const title = arg.event.title
