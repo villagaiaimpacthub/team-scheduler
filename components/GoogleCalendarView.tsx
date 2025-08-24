@@ -3,7 +3,6 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
-import timeGridPlugin from '@fullcalendar/timegrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import { Card } from './ui/Card'
 import { Button } from './ui/Button'
@@ -12,7 +11,7 @@ import { Icon } from './ui/Icon'
 export function GoogleCalendarView() {
   const [events, setEvents] = useState<any[]>([])
   const [range, setRange] = useState<{ start: string; end: string } | null>(null)
-  const [view, setView] = useState<'dayGridMonth' | 'timeGridWeek' | 'timeGridDay'>('timeGridWeek')
+  const [view] = useState<'dayGridMonth'>('dayGridMonth')
   const calendarRef = useRef<FullCalendar | null>(null)
   const [tooltip, setTooltip] = useState<{ x: number; y: number; title: string; time: string } | null>(null)
 
@@ -38,11 +37,7 @@ export function GoogleCalendarView() {
     const api = calendarRef.current?.getApi?.()
     api?.today()
   }
-  const changeView = (v: typeof view) => {
-    setView(v)
-    const api = calendarRef.current?.getApi?.()
-    api?.changeView(v)
-  }
+  // Month-only view; Week/Day removed
 
   return (
     <Card className="space-y-3">
@@ -58,17 +53,13 @@ export function GoogleCalendarView() {
             <Icon name="Calendar" className="h-4 w-4 mr-1" /> Today
           </Button>
         </div>
-        <div className="flex items-center gap-2">
-          <Button variant={view === 'dayGridMonth' ? 'default' : 'outline'} size="sm" onClick={() => changeView('dayGridMonth')}>Month</Button>
-          <Button variant={view === 'timeGridWeek' ? 'default' : 'outline'} size="sm" onClick={() => changeView('timeGridWeek')}>Week</Button>
-          <Button variant={view === 'timeGridDay' ? 'default' : 'outline'} size="sm" onClick={() => changeView('timeGridDay')}>Day</Button>
-        </div>
+        <div className="text-sm text-[var(--muted-foreground)]">Month</div>
       </div>
 
       <div className="relative rounded-md border border-[color:var(--border)]">
         <FullCalendar
           ref={calendarRef as any}
-          plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
+          plugins={[dayGridPlugin, interactionPlugin]}
           initialView={view}
           headerToolbar={false}
           height="auto"
@@ -87,8 +78,16 @@ export function GoogleCalendarView() {
           nowIndicator
           dayHeaderClassNames={() => ['text-[var(--muted-foreground)]']}
           eventClassNames={() => [
-            'bg-[var(--primary)] !border-none text-[var(--primary-foreground)] rounded-md shadow-sm hover:opacity-90 transition'
+            'bg-[var(--primary)] !border-none text-[var(--primary-foreground)] rounded-md shadow-sm',
+            'ring-1 ring-[color:var(--border)] hover:ring-[color:var(--foreground)]',
+            'transition'
           ]}
+          eventDidMount={(info) => {
+            const el = info.el as HTMLElement
+            el.style.backgroundColor = 'var(--primary)'
+            el.style.color = 'var(--primary-foreground)'
+            el.style.border = 'none'
+          }}
           slotDuration="00:30:00"
           slotLabelFormat={{ hour: 'numeric', minute: '2-digit', meridiem: true }}
           allDaySlot={false}
@@ -105,9 +104,18 @@ export function GoogleCalendarView() {
           eventMouseEnter={(info) => {
             const rect = (info.el as HTMLElement).getBoundingClientRect()
             const timeText = info.timeText
+            // Improve hover contrast
+            const el = info.el as HTMLElement
+            el.style.boxShadow = '0 0 0 2px var(--foreground) inset, 0 1px 2px rgba(0,0,0,0.2)'
+            el.style.filter = 'brightness(0.95)'
             setTooltip({ x: rect.right + 8, y: rect.top + 8, title: info.event.title, time: timeText })
           }}
-          eventMouseLeave={() => setTooltip(null)}
+          eventMouseLeave={(info) => {
+            const el = info.el as HTMLElement
+            el.style.boxShadow = ''
+            el.style.filter = ''
+            setTooltip(null)
+          }}
           contentHeight="auto"
         />
 

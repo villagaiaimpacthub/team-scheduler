@@ -55,8 +55,9 @@ export async function GET(request: NextRequest) {
         .gte('start_time', new Date().toISOString())
         .order('start_time', { ascending: true })
       if (e2) {
-        console.error('Error fetching meetings:', e2)
-        return NextResponse.json({ error: 'Failed to fetch meetings' }, { status: 500 })
+        console.error('Error fetching meetings (fallback):', e2)
+        // Return empty list instead of 500 to avoid UI error state
+        return NextResponse.json({ meetings: [] }, { status: 200 })
       }
       const formatted = (m2 || []).map((meeting: any) => ({
         id: meeting.id,
