@@ -14,6 +14,7 @@ export function GoogleCalendarView() {
   const [range, setRange] = useState<{ start: string; end: string } | null>(null)
   const [view, setView] = useState<'dayGridMonth' | 'timeGridWeek' | 'timeGridDay'>('timeGridWeek')
   const calendarRef = useRef<FullCalendar | null>(null)
+  const [tooltip, setTooltip] = useState<{ x: number; y: number; title: string; time: string } | null>(null)
 
   useEffect(() => {
     if (!range) return
@@ -64,7 +65,7 @@ export function GoogleCalendarView() {
         </div>
       </div>
 
-      <div className="rounded-md border border-[color:var(--border)]">
+      <div className="relative rounded-md border border-[color:var(--border)]">
         <FullCalendar
           ref={calendarRef as any}
           plugins={[dayGridPlugin, timeGridPlugin, interactionPlugin]}
@@ -85,9 +86,40 @@ export function GoogleCalendarView() {
           weekNumbers={false}
           nowIndicator
           dayHeaderClassNames={() => ['text-[var(--muted-foreground)]']}
-          eventClassNames={() => ['bg-[var(--primary)] !border-none text-[var(--primary-foreground)]']}
+          eventClassNames={() => [
+            'bg-[var(--primary)] !border-none text-[var(--primary-foreground)] rounded-md shadow-sm hover:opacity-90 transition'
+          ]}
+          slotDuration="00:30:00"
+          slotLabelFormat={{ hour: 'numeric', minute: '2-digit', meridiem: true }}
+          allDaySlot={false}
+          eventContent={(arg) => {
+            const timeText = arg.timeText
+            const title = arg.event.title
+            return {
+              html: `<div class="px-2 py-1">
+                       <div class="text-xs opacity-90">${timeText}</div>
+                       <div class="text-sm font-medium leading-tight">${title}</div>
+                     </div>`
+            }
+          }}
+          eventMouseEnter={(info) => {
+            const rect = (info.el as HTMLElement).getBoundingClientRect()
+            const timeText = info.timeText
+            setTooltip({ x: rect.right + 8, y: rect.top + 8, title: info.event.title, time: timeText })
+          }}
+          eventMouseLeave={() => setTooltip(null)}
           contentHeight="auto"
         />
+
+        {tooltip && (
+          <div
+            className="pointer-events-none fixed z-50 rounded-md border border-[color:var(--border)] bg-[var(--popover)] text-[var(--popover-foreground)] px-3 py-2 shadow-md"
+            style={{ left: tooltip.x, top: tooltip.y }}
+          >
+            <div className="text-xs opacity-80">{tooltip.time}</div>
+            <div className="text-sm font-medium">{tooltip.title}</div>
+          </div>
+        )}
       </div>
     </Card>
   )
