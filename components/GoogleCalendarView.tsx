@@ -39,6 +39,11 @@ export function GoogleCalendarView() {
   }
   // Month-only view; Week/Day removed
 
+  const onMonth = () => {
+    const api = calendarRef.current?.getApi?.()
+    api?.changeView('dayGridMonth')
+  }
+
   return (
     <Card className="space-y-3">
       <div className="flex items-center justify-between">
@@ -53,7 +58,11 @@ export function GoogleCalendarView() {
             <Icon name="Calendar" className="h-4 w-4 mr-1" /> Today
           </Button>
         </div>
-        <div className="text-sm text-[var(--muted-foreground)]">Month</div>
+        <div>
+          <Button variant="outline" size="sm" onClick={onMonth} aria-label="Switch to month view">
+            Month
+          </Button>
+        </div>
       </div>
 
       <div className="relative rounded-md border border-[color:var(--border)]">
