@@ -29,6 +29,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
+    const debug = request.nextUrl.searchParams.get('debug') === '1'
     const body = await request.json();
     const { title, description, startTime, endTime, duration, participants } = bookingSchema.parse(body);
 
@@ -91,13 +92,16 @@ export async function POST(request: NextRequest) {
         location: calendarEvent.hangoutLink || "",
         google_event_id: calendarEvent.id,
         organizer_id: (user as any).id,
-        participants: JSON.stringify(participants),
+        participants,
       })
       .select()
       .single();
 
     if (meetingError) {
       console.error("Error saving meeting to database:", meetingError);
+      if (debug) {
+        return NextResponse.json({ error: "Failed to save meeting", details: meetingError.message }, { status: 500 })
+      }
       throw new Error("Failed to save meeting");
     }
 
@@ -110,7 +114,7 @@ export async function POST(request: NextRequest) {
         title: meeting.title,
         startTime: meeting.start_time,
         endTime: meeting.end_time,
-        participants: JSON.parse(meeting.participants),
+        participants: meeting.participants,
         meetingLink: calendarEvent.hangoutLink,
         calendarEventId: calendarEvent.id,
       },
