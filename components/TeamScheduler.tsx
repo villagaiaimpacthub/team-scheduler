@@ -5,7 +5,7 @@ import { TeamMemberSelector } from './TeamMemberSelector'
 import { AvailabilityChecker } from './AvailabilityChecker'
 import { TimeSlotSelector } from './TimeSlotSelector'
 import { Button } from './ui/Button'
-import { Users, CheckCircle } from 'lucide-react'
+import { Icon } from './ui/Icon'
 
 interface TimeSlot {
   start: string
@@ -81,7 +81,7 @@ export function TeamScheduler() {
     return (
       <div className="max-w-2xl mx-auto p-6">
         <div className="text-center space-y-4">
-          <CheckCircle className="h-16 w-16 text-green-600 mx-auto" />
+          <Icon name="CheckCircle" className="h-16 w-16 text-green-600 mx-auto" />
           <h2 className="text-2xl font-bold text-green-700">Meeting Booked Successfully!</h2>
           
           <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-left">
@@ -114,7 +114,7 @@ export function TeamScheduler() {
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       <div className="text-center">
         <div className="flex items-center justify-center gap-2 mb-2">
-          <Users className="h-8 w-8 text-primary-600" />
+          <Icon name="Users" className="h-8 w-8 text-primary-600" />
           <h1 className="text-3xl font-bold">Team Scheduler</h1>
         </div>
         <p className="text-gray-600">Find and book team meetings with automatic calendar integration</p>

@@ -6,6 +6,17 @@
   html {
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+  :root {
+    --bg: 255 255 255;
+    --fg: 17 24 39;
+  }
+  .dark :root {
+    --bg: 17 24 39; /* gray-900 */
+    --fg: 243 244 246; /* gray-100 */
+  }
+  body {
+    @apply text-gray-900 bg-white dark:text-gray-100 dark:bg-gray-900;
+  }
 }
 
 @layer components {

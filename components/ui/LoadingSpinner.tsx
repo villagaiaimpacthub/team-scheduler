@@ -1,4 +1,4 @@
-import { Loader2 } from 'lucide-react'
+import { Icon } from './Icon'
 
 interface LoadingSpinnerProps {
   size?: 'sm' | 'md' | 'lg'
@@ -14,7 +14,7 @@ export function LoadingSpinner({ size = 'md', text }: LoadingSpinnerProps) {
 
   return (
     <div className="flex flex-col items-center justify-center p-8">
-      <Loader2 className={`animate-spin text-primary-600 ${sizeClasses[size]}`} />
+      <Icon name="Loader2" className={`animate-spin text-primary-600 ${sizeClasses[size]}`} />
       {text && <p className="mt-2 text-sm text-gray-600">{text}</p>}
     </div>
   )

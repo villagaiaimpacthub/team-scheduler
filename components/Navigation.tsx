@@ -3,7 +3,7 @@
 import { useAuth } from '@/app/providers'
 import Link from 'next/link'
 import { Button } from './ui/Button'
-import { Users, Calendar, LogOut } from 'lucide-react'
+import { Icon } from './ui/Icon'
 
 export function Navigation() {
   const { user, signOut } = useAuth()
@@ -18,7 +18,7 @@ export function Navigation() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex items-center gap-2">
-              <Users className="h-6 w-6 text-primary-600" />
+              <Icon name="Users" className="h-6 w-6 text-primary-600" />
               <span className="text-xl font-bold">Team Scheduler</span>
             </Link>
             
@@ -33,7 +33,7 @@ export function Navigation() {
                 href="/meetings"
                 className="text-gray-500 hover:text-gray-700 px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1"
               >
-                <Calendar className="h-4 w-4" />
+                <Icon name="Calendar" className="h-4 w-4" />
                 My Meetings
               </Link>
             </div>
@@ -48,7 +48,7 @@ export function Navigation() {
               size="sm"
               onClick={() => signOut()}
             >
-              <LogOut className="h-4 w-4 mr-2" />
+              <Icon name="LogOut" className="h-4 w-4 mr-2" />
               Sign Out
             </Button>
           </div>

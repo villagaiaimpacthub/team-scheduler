@@ -1,0 +1,39 @@
+{
+  "extends": ["next/core-web-vitals"],
+  "rules": {
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "react-icons",
+            "message": "Use lucide-react (via components/ui/Icon) instead."
+          },
+          {
+            "name": "@mui/icons-material",
+            "message": "Use lucide-react (via components/ui/Icon) instead."
+          },
+          {
+            "name": "@heroicons/react",
+            "message": "Use lucide-react (via components/ui/Icon) instead."
+          },
+          {
+            "name": "lucide-react",
+            "importNames": ["*", "default", "Loader2", "Users", "Calendar", "Clock", "Video", "ExternalLink", "Check", "CheckCircle", "LogOut"],
+            "message": "Import icons through components/ui/Icon."
+          }
+        ],
+        "patterns": []
+      }
+    ]
+  }
+  ,
+  "overrides": [
+    {
+      "files": ["components/ui/Button.tsx"],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    }
+  ]
+}

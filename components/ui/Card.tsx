@@ -1,13 +1,14 @@
-import { ReactNode } from 'react'
-import { clsx } from 'clsx'
+import { type HTMLAttributes } from 'react'
 
-interface CardProps {
-  children: ReactNode
-  className?: string
+function cn(...classes: Array<string | undefined | false | null>) {
+  return classes.filter(Boolean).join(' ')
+}
+
+type CardProps = HTMLAttributes<HTMLDivElement> & {
   padding?: 'none' | 'sm' | 'md' | 'lg'
 }
 
-export function Card({ children, className, padding = 'md' }: CardProps) {
+export function Card({ children, className, padding = 'md', ...props }: CardProps) {
   const paddingClasses = {
     none: '',
     sm: 'p-4',
@@ -16,11 +17,10 @@ export function Card({ children, className, padding = 'md' }: CardProps) {
   }
 
   return (
-    <div className={clsx(
-      'bg-white rounded-lg shadow-md border border-gray-200',
-      paddingClasses[padding],
-      className
-    )}>
+    <div
+      className={cn('bg-white rounded-lg shadow-md border border-gray-200', paddingClasses[padding], className)}
+      {...props}
+    >
       {children}
     </div>
   )

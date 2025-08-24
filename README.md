@@ -1,3 +1,20 @@
+## Embedding / Using in other apps
+
+This app is safe to embed in other sites/apps via iframe or as a route-mounted microfrontend.
+
+- Force dark mode by default; a theme toggle (Sun/Moon) is available bottom-right.
+- To embed, host this app (e.g., Vercel) and include:
+
+```html
+<iframe
+  src="https://your-hosted-team-scheduler.app"
+  style="width:100%;height:100vh;border:0;"
+  allow="clipboard-read; clipboard-write"
+></iframe>
+```
+
+If embedding in a different origin, ensure any required CORS headers are enabled for API endpoints under `app/api/*`.
+
 # Team Scheduler - Standalone Team Meeting Scheduler
 
 A clean, minimal standalone app for scheduling team meetings with Google Calendar integration. Built with Next.js 14 and Supabase, it allows teams to find common availability and book meetings that create real Google Calendar events.

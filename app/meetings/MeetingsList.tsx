@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Card } from '@/components/ui/Card'
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner'
-import { Calendar, Clock, Users, Video, ExternalLink } from 'lucide-react'
+import { Icon } from '@/components/ui/Icon'
 import { format } from 'date-fns'
 
 interface Meeting {
@@ -74,7 +74,7 @@ export function MeetingsList() {
     return (
       <Card>
         <div className="text-center p-8">
-          <Calendar className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+          <Icon name="Calendar" className="h-12 w-12 text-gray-400 mx-auto mb-4" />
           <h3 className="text-lg font-semibold text-gray-900 mb-2">No meetings scheduled</h3>
           <p className="text-gray-600">Schedule your first team meeting to see it here.</p>
         </div>
@@ -95,23 +95,23 @@ export function MeetingsList() {
                 
                 <div className="space-y-2 text-sm text-gray-600">
                   <div className="flex items-center gap-2">
-                    <Calendar className="h-4 w-4" />
+                    <Icon name="Calendar" className="h-4 w-4" />
                     <span>{formatDateTime(meeting.startTime)}</span>
                   </div>
                   
                   <div className="flex items-center gap-2">
-                    <Clock className="h-4 w-4" />
+                    <Icon name="Clock" className="h-4 w-4" />
                     <span>{meeting.duration} minutes</span>
                   </div>
                   
                   <div className="flex items-center gap-2">
-                    <Users className="h-4 w-4" />
+                    <Icon name="Users" className="h-4 w-4" />
                     <span>{meeting.participants.length + 1} participants</span>
                   </div>
                   
                   {meeting.location && (
                     <div className="flex items-center gap-2">
-                      <Video className="h-4 w-4" />
+                      <Icon name="Video" className="h-4 w-4" />
                       <a
                         href={meeting.location}
                         target="_blank"
@@ -119,7 +119,7 @@ export function MeetingsList() {
                         className="text-primary-600 hover:text-primary-700 underline flex items-center gap-1"
                       >
                         Google Meet
-                        <ExternalLink className="h-3 w-3" />
+                        <Icon name="ExternalLink" className="h-3 w-3" />
                       </a>
                     </div>
                   )}

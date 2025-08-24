@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Card } from './ui/Card'
 import { LoadingSpinner } from './ui/LoadingSpinner'
-import { Users, Check } from 'lucide-react'
+import { Icon } from './ui/Icon'
 
 interface TeamMember {
   id: string
@@ -75,7 +75,7 @@ export function TeamMemberSelector({ selectedEmails, onSelectionChange }: TeamMe
     return (
       <Card>
         <div className="flex items-center gap-2 mb-4">
-          <Users className="h-5 w-5" />
+          <Icon name="Users" className="h-5 w-5" />
           <h3 className="text-lg font-semibold">Team Members</h3>
         </div>
         <p className="text-gray-500">
@@ -88,7 +88,7 @@ export function TeamMemberSelector({ selectedEmails, onSelectionChange }: TeamMe
   return (
     <Card>
       <div className="flex items-center gap-2 mb-4">
-        <Users className="h-5 w-5" />
+        <Icon name="Users" className="h-5 w-5" />
         <h3 className="text-lg font-semibold">
           Team Members ({selectedEmails.length} selected)
         </h3>
@@ -130,7 +130,7 @@ export function TeamMemberSelector({ selectedEmails, onSelectionChange }: TeamMe
               </div>
               
               {isSelected && (
-                <Check className="h-4 w-4 text-primary-600" />
+                <Icon name="Check" className="h-4 w-4 text-primary-600" />
               )}
             </div>
           )

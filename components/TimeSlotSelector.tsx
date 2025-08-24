@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Card } from './ui/Card'
 import { Button } from './ui/Button'
-import { Calendar, Clock, Video } from 'lucide-react'
+import { Icon } from './ui/Icon'
 import { format } from 'date-fns'
 
 interface TimeSlot {
@@ -51,7 +51,7 @@ export function TimeSlotSelector({ slots, duration, participants, onBooking }: T
   return (
     <Card>
       <div className="flex items-center gap-2 mb-4">
-        <Calendar className="h-5 w-5 text-green-600" />
+        <Icon name="Calendar" className="h-5 w-5 text-green-600" />
         <h3 className="text-lg font-semibold text-green-700">
           Available Times ({slots.length} slots found)
         </h3>
@@ -98,7 +98,7 @@ export function TimeSlotSelector({ slots, duration, participants, onBooking }: T
               disabled={!title.trim()}
               className="flex-1"
             >
-              <Video className="h-4 w-4 mr-2" />
+              <Icon name="Video" className="h-4 w-4 mr-2" />
               Book Meeting
             </Button>
             <Button
@@ -118,7 +118,7 @@ export function TimeSlotSelector({ slots, duration, participants, onBooking }: T
                 className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-gray-300 hover:bg-gray-50 transition-colors"
               >
                 <div className="flex items-center gap-3">
-                  <Calendar className="h-4 w-4 text-gray-500" />
+                  <Icon name="Calendar" className="h-4 w-4 text-gray-500" />
                   <div>
                     <p className="font-medium text-sm">
                       {formatDateTime(slot.start)}

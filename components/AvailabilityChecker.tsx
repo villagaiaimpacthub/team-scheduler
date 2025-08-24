@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { Card } from './ui/Card'
 import { Button } from './ui/Button'
-import { Clock, Calendar, Search } from 'lucide-react'
+import { Icon } from './ui/Icon'
 
 interface TimeSlot {
   start: string
@@ -64,7 +64,7 @@ export function AvailabilityChecker({ selectedEmails, onSlotsFound }: Availabili
   return (
     <Card>
       <div className="flex items-center gap-2 mb-4">
-        <Search className="h-5 w-5" />
+        <Icon name="Search" className="h-5 w-5" />
         <h3 className="text-lg font-semibold">Find Available Times</h3>
       </div>
 
@@ -72,7 +72,7 @@ export function AvailabilityChecker({ selectedEmails, onSlotsFound }: Availabili
         {/* Duration Selection */}
         <div>
           <label className="label">
-            <Clock className="inline h-4 w-4 mr-1" />
+            <Icon name="Clock" className="inline h-4 w-4 mr-1" />
             Meeting Duration
           </label>
           <select
@@ -92,7 +92,7 @@ export function AvailabilityChecker({ selectedEmails, onSlotsFound }: Availabili
         {/* Days to Check */}
         <div>
           <label className="label">
-            <Calendar className="inline h-4 w-4 mr-1" />
+            <Icon name="Calendar" className="inline h-4 w-4 mr-1" />
             Search Period
           </label>
           <select

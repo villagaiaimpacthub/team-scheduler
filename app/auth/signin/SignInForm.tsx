@@ -3,7 +3,7 @@
 import { supabase } from '@/lib/supabase'
 import { Card } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
-import { Users, Calendar, Clock } from 'lucide-react'
+import { Icon } from '@/components/ui/Icon'
 
 export function SignInForm() {
   const handleGoogleSignIn = async () => {
@@ -29,7 +29,7 @@ export function SignInForm() {
       <div className="text-center space-y-6">
         <div>
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Users className="h-10 w-10 text-primary-600" />
+            <Icon name="Users" className="h-10 w-10 text-primary-600" />
             <h1 className="text-2xl font-bold">Team Scheduler</h1>
           </div>
           <p className="text-gray-600">Schedule team meetings with Google Calendar integration</p>
@@ -38,15 +38,15 @@ export function SignInForm() {
         <div className="space-y-4">
           <div className="grid grid-cols-3 gap-4 text-center">
             <div className="space-y-2">
-              <Users className="h-8 w-8 text-primary-600 mx-auto" />
+              <Icon name="Users" className="h-8 w-8 text-primary-600 mx-auto" />
               <p className="text-xs text-gray-600">Select Team</p>
             </div>
             <div className="space-y-2">
-              <Clock className="h-8 w-8 text-primary-600 mx-auto" />
+              <Icon name="Clock" className="h-8 w-8 text-primary-600 mx-auto" />
               <p className="text-xs text-gray-600">Find Times</p>
             </div>
             <div className="space-y-2">
-              <Calendar className="h-8 w-8 text-primary-600 mx-auto" />
+              <Icon name="Calendar" className="h-8 w-8 text-primary-600 mx-auto" />
               <p className="text-xs text-gray-600">Book Meeting</p>
             </div>
           </div>
