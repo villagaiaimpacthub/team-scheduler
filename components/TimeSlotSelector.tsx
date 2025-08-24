@@ -51,19 +51,19 @@ export function TimeSlotSelector({ slots, duration, participants, onBooking }: T
   return (
     <Card>
       <div className="flex items-center gap-2 mb-4">
-        <Icon name="Calendar" className="h-5 w-5 text-green-600" />
-        <h3 className="text-lg font-semibold text-green-700">
+        <Icon name="Calendar" className="h-5 w-5 text-[var(--primary)]" />
+        <h3 className="text-lg font-semibold">
           Available Times ({slots.length} slots found)
         </h3>
       </div>
 
       {showBookingForm && selectedSlot ? (
         <div className="space-y-4">
-          <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-            <p className="text-sm font-medium text-green-700">
+          <div className="p-3 rounded-lg border bg-[var(--card)] text-[var(--card-foreground)] border-[color:var(--border)]">
+            <p className="text-sm font-medium">
               Selected: {formatDateTime(selectedSlot.start)}
             </p>
-            <p className="text-xs text-green-600">
+            <p className="text-xs text-[var(--muted-foreground)]">
               Duration: {duration} minutes • {participants.length} participants
             </p>
           </div>
@@ -115,15 +115,15 @@ export function TimeSlotSelector({ slots, duration, participants, onBooking }: T
             {slots.map((slot, index) => (
               <div
                 key={index}
-                className="flex items-center justify-between p-3 border border-gray-200 rounded-lg hover:border-gray-300 hover:bg-gray-50 transition-colors"
+                className="flex items-center justify-between p-3 rounded-lg transition-colors border bg-[var(--card)] hover:bg-[var(--muted)] border-[color:var(--border)]"
               >
                 <div className="flex items-center gap-3">
-                  <Icon name="Calendar" className="h-4 w-4 text-gray-500" />
+                  <Icon name="Calendar" className="h-4 w-4" />
                   <div>
                     <p className="font-medium text-sm">
                       {formatDateTime(slot.start)}
                     </p>
-                    <p className="text-xs text-gray-500">
+                    <p className="text-xs text-[var(--muted-foreground)]">
                       {duration} minutes • {participants.length} participants
                     </p>
                   </div>
@@ -140,7 +140,7 @@ export function TimeSlotSelector({ slots, duration, participants, onBooking }: T
             ))}
           </div>
 
-          <p className="text-xs text-gray-500 text-center">
+          <p className="text-xs text-[var(--muted-foreground)] text-center">
             Times shown are when all participants are available
           </p>
         </div>

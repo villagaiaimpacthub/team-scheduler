@@ -22,7 +22,7 @@ export default function RootLayout({
         <Providers>
           <Navigation />
           <ThemeToggle />
-          <main className="min-h-screen bg-gray-50 dark:bg-gray-900">
+          <main className="min-h-screen bg-[var(--background)] text-[var(--foreground)]">
             {children}
           </main>
         </Providers>

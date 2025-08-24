@@ -74,9 +74,9 @@ export function MeetingsList() {
     return (
       <Card>
         <div className="text-center p-8">
-          <Icon name="Calendar" className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <h3 className="text-lg font-semibold text-gray-900 mb-2">No meetings scheduled</h3>
-          <p className="text-gray-600">Schedule your first team meeting to see it here.</p>
+          <Icon name="Calendar" className="h-12 w-12 text-[var(--muted-foreground)] mx-auto mb-4" />
+          <h3 className="text-lg font-semibold mb-2">No meetings scheduled</h3>
+          <p className="text-[var(--muted-foreground)]">Schedule your first team meeting to see it here.</p>
         </div>
       </Card>
     )
@@ -89,11 +89,11 @@ export function MeetingsList() {
           <div className="p-6">
             <div className="flex items-start justify-between">
               <div className="flex-1">
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                <h3 className="text-lg font-semibold mb-2">
                   {meeting.title}
                 </h3>
                 
-                <div className="space-y-2 text-sm text-gray-600">
+                <div className="space-y-2 text-sm text-[var(--muted-foreground)]">
                   <div className="flex items-center gap-2">
                     <Icon name="Calendar" className="h-4 w-4" />
                     <span>{formatDateTime(meeting.startTime)}</span>
@@ -116,7 +116,7 @@ export function MeetingsList() {
                         href={meeting.location}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-primary-600 hover:text-primary-700 underline flex items-center gap-1"
+                        className="text-[var(--primary)] underline flex items-center gap-1"
                       >
                         Google Meet
                         <Icon name="ExternalLink" className="h-3 w-3" />
@@ -126,21 +126,21 @@ export function MeetingsList() {
                 </div>
 
                 {meeting.description && (
-                  <p className="mt-3 text-sm text-gray-700">
+                  <p className="mt-3 text-sm text-[var(--muted-foreground)]">
                     {meeting.description}
                   </p>
                 )}
 
                 <div className="mt-4">
-                  <p className="text-xs text-gray-500 mb-2">Participants:</p>
+                  <p className="text-xs text-[var(--muted-foreground)] mb-2">Participants:</p>
                   <div className="flex flex-wrap gap-2">
-                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800">
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--muted)] text-[var(--foreground)]">
                       {meeting.organizer.name || meeting.organizer.email} (organizer)
                     </span>
                     {meeting.participants.map((email, index) => (
                       <span
                         key={index}
-                        className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"
+                        className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-[var(--muted)] text-[var(--foreground)]"
                       >
                         {email}
                       </span>

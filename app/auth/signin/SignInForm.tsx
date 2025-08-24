@@ -34,25 +34,25 @@ export function SignInForm() {
       <div className="text-center space-y-6">
         <div>
           <div className="flex items-center justify-center gap-2 mb-4">
-            <Icon name="Users" className="h-10 w-10 text-primary-600" />
+            <Icon name="Users" className="h-10 w-10 text-[var(--primary)]" />
             <h1 className="text-2xl font-bold">Team Scheduler</h1>
           </div>
-          <p className="text-gray-600">Schedule team meetings with Google Calendar integration</p>
+          <p className="text-[var(--muted-foreground)]">Schedule team meetings with Google Calendar integration</p>
         </div>
 
         <div className="space-y-4">
           <div className="grid grid-cols-3 gap-4 text-center">
             <div className="space-y-2">
-              <Icon name="Users" className="h-8 w-8 text-primary-600 mx-auto" />
-              <p className="text-xs text-gray-600">Select Team</p>
+              <Icon name="Users" className="h-8 w-8 text-[var(--primary)] mx-auto" />
+              <p className="text-xs text-[var(--muted-foreground)]">Select Team</p>
             </div>
             <div className="space-y-2">
-              <Icon name="Clock" className="h-8 w-8 text-primary-600 mx-auto" />
-              <p className="text-xs text-gray-600">Find Times</p>
+              <Icon name="Clock" className="h-8 w-8 text-[var(--primary)] mx-auto" />
+              <p className="text-xs text-[var(--muted-foreground)]">Find Times</p>
             </div>
             <div className="space-y-2">
-              <Icon name="Calendar" className="h-8 w-8 text-primary-600 mx-auto" />
-              <p className="text-xs text-gray-600">Book Meeting</p>
+              <Icon name="Calendar" className="h-8 w-8 text-[var(--primary)] mx-auto" />
+              <p className="text-xs text-[var(--muted-foreground)]">Book Meeting</p>
             </div>
           </div>
 
@@ -82,7 +82,7 @@ export function SignInForm() {
           </Button>
         </div>
 
-        <div className="text-xs text-gray-500 space-y-1">
+        <div className="text-xs text-[var(--muted-foreground)] space-y-1">
           <p>• Requires Google Calendar access</p>
           <p>• Works with your company domain</p>
           <p>• Creates real calendar events</p>

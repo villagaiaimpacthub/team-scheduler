@@ -17,8 +17,8 @@ export default function SignInPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin h-8 w-8 border-4 border-primary-600 border-t-transparent rounded-full"></div>
+      <div className="min-h-screen flex items-center justify-center bg-[var(--background)]">
+        <div className="animate-spin h-8 w-8 border-4 border-[var(--primary)] border-t-transparent rounded-full"></div>
       </div>
     )
   }
@@ -28,7 +28,7 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-[var(--background)] text-[var(--foreground)]">
       <div className="rounded-lg shadow-md border p-6 w-full max-w-md bg-[var(--card)] text-[var(--card-foreground)] border-[color:var(--border)]">
         <SignInForm />
       </div>

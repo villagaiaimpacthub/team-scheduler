@@ -78,7 +78,7 @@ export function TeamMemberSelector({ selectedEmails, onSelectionChange }: TeamMe
           <Icon name="Users" className="h-5 w-5" />
           <h3 className="text-lg font-semibold">Team Members</h3>
         </div>
-        <p className="text-gray-500">
+        <p className="text-[var(--muted-foreground)]">
           No teammates found. Make sure your colleagues have signed in with the same company domain.
         </p>
       </Card>
@@ -101,10 +101,10 @@ export function TeamMemberSelector({ selectedEmails, onSelectionChange }: TeamMe
           return (
             <div
               key={member.id}
-              className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors ${
+              className={`flex items-center justify-between p-3 rounded-lg cursor-pointer transition-colors border ${
                 isSelected
-                  ? 'bg-primary-50 border border-primary-200'
-                  : 'bg-gray-50 hover:bg-gray-100 border border-transparent'
+                  ? 'bg-[var(--accent)] border-[color:var(--border)]'
+                  : 'bg-[var(--card)] hover:bg-[var(--muted)] border-[color:var(--border)]'
               }`}
               onClick={() => toggleMemberSelection(member.email)}
             >
@@ -116,8 +116,8 @@ export function TeamMemberSelector({ selectedEmails, onSelectionChange }: TeamMe
                     className="h-8 w-8 rounded-full"
                   />
                 ) : (
-                  <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
-                    <span className="text-xs font-medium text-gray-600">
+                  <div className="h-8 w-8 rounded-full bg-[color:var(--border)] flex items-center justify-center">
+                    <span className="text-xs font-medium text-[var(--muted-foreground)]">
                       {member.name.charAt(0).toUpperCase()}
                     </span>
                   </div>
@@ -125,12 +125,12 @@ export function TeamMemberSelector({ selectedEmails, onSelectionChange }: TeamMe
                 
                 <div>
                   <div className="font-medium text-sm">{member.name}</div>
-                  <div className="text-xs text-gray-500">{member.email}</div>
+                  <div className="text-xs text-[var(--muted-foreground)]">{member.email}</div>
                 </div>
               </div>
               
               {isSelected && (
-                <Icon name="Check" className="h-4 w-4 text-primary-600" />
+                <Icon name="Check" className="h-4 w-4 text-[var(--primary)]" />
               )}
             </div>
           )

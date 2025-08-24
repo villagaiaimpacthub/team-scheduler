@@ -96,4 +96,8 @@
     @apply block text-sm font-medium mb-1;
     color: var(--muted-foreground);
   }
+
+  h1 { @apply text-2xl font-bold; color: var(--foreground); }
+  h2 { @apply text-xl font-semibold; color: var(--foreground); }
+  h3 { @apply text-lg font-semibold; color: var(--foreground); }
 }

@@ -108,8 +108,8 @@ export function AvailabilityChecker({ selectedEmails, onSlotsFound }: Availabili
 
         {/* Error Message */}
         {error && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
-            <p className="text-sm text-red-600">{error}</p>
+          <div className="p-3 rounded-lg border bg-[var(--card)] text-[var(--card-foreground)] border-[color:var(--border)]">
+            <p className="text-sm text-[var(--muted-foreground)]">{error}</p>
           </div>
         )}
 
@@ -127,7 +127,7 @@ export function AvailabilityChecker({ selectedEmails, onSlotsFound }: Availabili
         </Button>
 
         {/* Info */}
-        <div className="text-xs text-gray-500 space-y-1">
+        <div className="text-xs text-[var(--muted-foreground)] space-y-1">
           <p>• Searches business hours (9 AM - 5 PM, weekdays only)</p>
           <p>• Requires Google Calendar access for all participants</p>
           <p>• Shows times when everyone is available</p>

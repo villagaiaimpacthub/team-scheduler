@@ -79,14 +79,14 @@ export function TeamScheduler() {
 
   if (bookingResult) {
     return (
-      <div className="max-w-2xl mx-auto p-6">
+      <div className="p-2">
         <div className="text-center space-y-4">
-          <Icon name="CheckCircle" className="h-16 w-16 text-green-600 mx-auto" />
-          <h2 className="text-2xl font-bold text-green-700">Meeting Booked Successfully!</h2>
+          <Icon name="CheckCircle" className="h-16 w-16 text-green-500 mx-auto" />
+          <h2 className="text-2xl font-bold text-[var(--foreground)]">Meeting Booked Successfully!</h2>
           
-          <div className="bg-green-50 border border-green-200 rounded-lg p-6 text-left">
-            <h3 className="font-semibold text-green-800 mb-2">{bookingResult.meeting.title}</h3>
-            <div className="space-y-1 text-sm text-green-700">
+          <div className="rounded-lg border p-6 text-left bg-[var(--card)] text-[var(--card-foreground)] border-[color:var(--border)]">
+            <h3 className="font-semibold mb-2">{bookingResult.meeting.title}</h3>
+            <div className="space-y-1 text-sm text-[var(--muted-foreground)]">
               <p><strong>When:</strong> {new Date(bookingResult.meeting.startTime).toLocaleString()}</p>
               <p><strong>Duration:</strong> {duration} minutes</p>
               <p><strong>Participants:</strong> {bookingResult.meeting.participants.length + 1} people</p>
@@ -96,7 +96,7 @@ export function TeamScheduler() {
             </div>
           </div>
 
-          <div className="text-sm text-gray-600 space-y-1">
+          <div className="text-sm text-[var(--muted-foreground)] space-y-1">
             <p>✅ Calendar invites sent to all participants</p>
             <p>✅ Google Calendar events created</p>
             <p>✅ Meeting notifications enabled</p>
@@ -114,8 +114,8 @@ export function TeamScheduler() {
     <div className="p-2 space-y-6">
       <div className="text-center">
         <div className="flex items-center justify-center gap-2 mb-2">
-          <Icon name="Users" className="h-8 w-8 text-primary-600" />
-          <h1 className="text-3xl font-bold">Team Scheduler</h1>
+          <Icon name="Users" className="h-8 w-8 text-[var(--primary)]" />
+          <h1 className="text-3xl font-bold text-[var(--foreground)]">Team Scheduler</h1>
         </div>
         <p className="text-[var(--muted-foreground)]">Find and book team meetings with automatic calendar integration</p>
       </div>
@@ -145,7 +145,7 @@ export function TeamScheduler() {
           {booking ? (
             <div className="flex items-center justify-center p-8">
               <div className="text-center">
-                <div className="animate-spin h-8 w-8 border-4 border-primary-600 border-t-transparent rounded-full mx-auto mb-4"></div>
+                <div className="animate-spin h-8 w-8 border-4 border-[var(--primary)] border-t-transparent rounded-full mx-auto mb-4"></div>
                 <p className="text-[var(--muted-foreground)]">Booking meeting...</p>
                 <p className="text-sm text-[var(--muted-foreground)] mt-1">Creating calendar events and sending invites</p>
               </div>

@@ -18,7 +18,7 @@ export default function HomePage() {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin h-8 w-8 border-4 border-primary-600 border-t-transparent rounded-full"></div>
+        <div className="animate-spin h-8 w-8 border-4 border-[var(--primary)] border-t-transparent rounded-full"></div>
       </div>
     )
   }
@@ -28,13 +28,10 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen p-4">
-      <div className="space-y-6">
+    <div className="min-h-screen p-4 bg-[var(--background)] text-[var(--foreground)]">
+      <div className="space-y-6 w-full max-w-md mx-auto">
         <div className="rounded-lg shadow-md border p-6 bg-[var(--card)] text-[var(--card-foreground)] border-[color:var(--border)]">
           <TeamScheduler />
-        </div>
-        <div className="rounded-lg shadow-md border p-6 bg-[var(--card)] text-[var(--card-foreground)] border-[color:var(--border)]">
-          {/* Availability card remains full width */}
         </div>
       </div>
     </div>

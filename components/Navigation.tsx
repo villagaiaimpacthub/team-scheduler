@@ -18,8 +18,8 @@ export function Navigation() {
         <div className="flex justify-between h-16">
           <div className="flex items-center">
             <Link href="/" className="flex items-center gap-2">
-              <Icon name="Users" className="h-6 w-6 text-primary-600" />
-              <span className="text-xl font-bold">Team Scheduler</span>
+              <Icon name="Users" className="h-6 w-6 text-[var(--primary)]" />
+              <span className="text-xl font-bold text-[var(--foreground)]">Team Scheduler</span>
             </Link>
             
             <div className="ml-10 flex items-baseline space-x-4">
@@ -40,7 +40,7 @@ export function Navigation() {
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="text-sm text-gray-700">
+            <div className="text-sm text-[var(--muted-foreground)]">
               {user.user_metadata?.full_name || user.email}
             </div>
             <Button

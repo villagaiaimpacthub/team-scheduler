@@ -14,8 +14,8 @@ export function LoadingSpinner({ size = 'md', text }: LoadingSpinnerProps) {
 
   return (
     <div className="flex flex-col items-center justify-center p-8">
-      <Icon name="Loader2" className={`animate-spin text-primary-600 ${sizeClasses[size]}`} />
-      {text && <p className="mt-2 text-sm text-gray-600">{text}</p>}
+      <Icon name="Loader2" className={`animate-spin text-[var(--primary)] ${sizeClasses[size]}`} />
+      {text && <p className="mt-2 text-sm text-[var(--muted-foreground)]">{text}</p>}
     </div>
   )
 }
