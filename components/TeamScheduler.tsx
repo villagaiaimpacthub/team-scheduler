@@ -111,13 +111,13 @@ export function TeamScheduler() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
+    <div className="p-2 space-y-6">
       <div className="text-center">
         <div className="flex items-center justify-center gap-2 mb-2">
           <Icon name="Users" className="h-8 w-8 text-primary-600" />
           <h1 className="text-3xl font-bold">Team Scheduler</h1>
         </div>
-        <p className="text-gray-600 dark:text-gray-300">Find and book team meetings with automatic calendar integration</p>
+        <p className="text-[var(--muted-foreground)]">Find and book team meetings with automatic calendar integration</p>
       </div>
 
       {error && (
@@ -126,7 +126,7 @@ export function TeamScheduler() {
         </div>
       )}
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="space-y-6">
         <div className="space-y-6">
           <TeamMemberSelector
             selectedEmails={selectedEmails}
@@ -141,14 +141,13 @@ export function TeamScheduler() {
             }}
           />
         </div>
-
         <div>
           {booking ? (
             <div className="flex items-center justify-center p-8">
               <div className="text-center">
                 <div className="animate-spin h-8 w-8 border-4 border-primary-600 border-t-transparent rounded-full mx-auto mb-4"></div>
-                <p className="text-gray-600">Booking meeting...</p>
-                <p className="text-sm text-gray-500 mt-1">Creating calendar events and sending invites</p>
+                <p className="text-[var(--muted-foreground)]">Booking meeting...</p>
+                <p className="text-sm text-[var(--muted-foreground)] mt-1">Creating calendar events and sending invites</p>
               </div>
             </div>
           ) : (

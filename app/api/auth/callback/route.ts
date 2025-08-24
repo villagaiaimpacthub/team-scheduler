@@ -36,6 +36,21 @@ export async function GET(request: NextRequest) {
         }
       }
 
+      // Ensure a row exists in users table for our getServerSession logic
+      try {
+        const email = user.email || '';
+        const domain = email.includes('@') ? email.split('@')[1] : null;
+        await supabase.from('users').upsert({
+          id: user.id,
+          email,
+          name: (user.user_metadata as any)?.full_name || user.user_metadata?.name || null,
+          image_url: (user.user_metadata as any)?.avatar_url || null,
+          domain,
+        }, { onConflict: 'id' });
+      } catch (e) {
+        console.error('Upsert users row failed', e);
+      }
+
       // Redirect to home page
       return NextResponse.redirect(`${origin}/`);
     }
