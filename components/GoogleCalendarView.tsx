@@ -70,7 +70,7 @@ export function GoogleCalendarView() {
           themeSystem="standard"
           dayMaxEventRows
           expandRows
-          aspectRatio={1.5}
+          aspectRatio={1.2}
           moreLinkClick="popover"
           locale="en"
           navLinks
@@ -94,12 +94,11 @@ export function GoogleCalendarView() {
           eventContent={(arg) => {
             const timeText = arg.timeText
             const title = arg.event.title
-            return {
-              html: `<div class="px-2 py-1">
-                       <div class="text-xs opacity-90">${timeText}</div>
-                       <div class="text-sm font-medium leading-tight">${title}</div>
-                     </div>`
-            }
+            const isSmall = typeof window !== 'undefined' && window.innerWidth < 640
+            const html = isSmall
+              ? `<div class=\"px-1 py-0.5\"><div class=\"text-[10px] leading-tight\">${title}</div></div>`
+              : `<div class=\"px-2 py-1\">\n                   <div class=\"text-xs opacity-90\">${timeText}</div>\n                   <div class=\"text-sm font-medium leading-tight\">${title}</div>\n                 </div>`
+            return { html }
           }}
           eventMouseEnter={(info) => {
             const rect = (info.el as HTMLElement).getBoundingClientRect()

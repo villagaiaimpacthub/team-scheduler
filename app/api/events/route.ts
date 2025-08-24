@@ -38,12 +38,20 @@ export async function GET(request: NextRequest) {
     const list = await svc.listUserEventsWithAttendees(start, end)
 
     // Map to FullCalendar event format
-    const events = (list || []).map(e => ({
-      id: e.id,
-      title: e.summary || 'Busy',
-      start: e.start?.dateTime,
-      end: e.end?.dateTime,
-    }))
+    const events = (list || []).map(e => {
+      const startVal = (e.start?.dateTime as string) || ''
+      const endVal = (e.end?.dateTime as string) || ''
+      // Support all-day events where Google may return date without time
+      const startIso = startVal && startVal.length > 10 ? startVal : (e.start?.dateTime as string)
+      const endIso = endVal && endVal.length > 10 ? endVal : (e.end?.dateTime as string)
+      return {
+        id: e.id,
+        title: e.summary || 'Busy',
+        start: startIso,
+        end: endIso,
+        allDay: startIso?.length <= 10 || endIso?.length <= 10,
+      }
+    })
 
     return NextResponse.json({ events })
   } catch (e: any) {
