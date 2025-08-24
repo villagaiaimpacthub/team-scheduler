@@ -36,11 +36,19 @@ export async function getServerSession(): Promise<AuthSession | null> {
       if (!raw) return;
       const decoded = Buffer.from(raw, 'base64').toString('utf-8');
       const json = JSON.parse(decoded) as any;
-      const access_token = json?.access_token;
-      const refresh_token = json?.refresh_token;
-      const expires_in = json?.expires_in;
+      const access_token = json?.access_token as string | undefined;
+      const refresh_token = json?.refresh_token as string | undefined;
+      if (access_token) {
+        // Prefer direct getUser(access_token) which doesn't rely on internal session state
+        const { data: direct } = await supabase.auth.getUser(access_token);
+        if (direct?.user) {
+          return { user: direct.user } as any;
+        }
+      }
       if (access_token && refresh_token) {
         await supabase.auth.setSession({ access_token, refresh_token });
+        const { data: sess } = await supabase.auth.getSession();
+        if (sess?.session?.user) return { user: sess.session.user } as any;
       }
     } catch {}
   };
@@ -52,7 +60,8 @@ export async function getServerSession(): Promise<AuthSession | null> {
 
   // Fallback to session if getUser is null (some hosting contexts)
   if (!authUser) {
-    await primeSessionFromCookies();
+    const primed = await primeSessionFromCookies();
+    if (primed?.user) authUser = primed.user as any;
     const { data: sessionData } = await supabase.auth.getSession();
     authUser = (sessionData?.session as any)?.user || null;
     if (!authUser) {
