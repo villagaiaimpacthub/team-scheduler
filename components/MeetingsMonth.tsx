@@ -24,11 +24,21 @@ export function MeetingsMonth() {
   useEffect(() => {
     const start = new Date(month.getFullYear(), month.getMonth(), 1)
     const end = new Date(month.getFullYear(), month.getMonth() + 1, 0)
-    const qs = `start=${encodeURIComponent(start.toISOString())}&end=${encodeURIComponent(end.toISOString())}`
+    const qs = `start=${encodeURIComponent(start.toISOString())}&end=${encodeURIComponent(end.toISOString())}&debug=1`
     fetch(`/api/events?${qs}`, { credentials: 'include', cache: 'no-store' })
-      .then((r) => r.json())
-      .then((j) => setEvents(j.events || []))
-      .catch(() => setEvents([]))
+      .then(async (r) => {
+        const j = await r.json().catch(() => ({}))
+        if (!r.ok) {
+          console.error('[month] events error', j)
+          setEvents([])
+          return
+        }
+        setEvents(j.events || [])
+      })
+      .catch((e) => {
+        console.error('[month] fetch failed', e)
+        setEvents([])
+      })
   }, [month])
 
   const meetingsByDay = useMemo(() => {
