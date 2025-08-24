@@ -17,9 +17,10 @@ interface AvailabilityResponse {
 interface AvailabilityCheckerProps {
   selectedEmails: string[]
   onSlotsFound: (slots: TimeSlot[]) => void
+  onSuggestionsFound?: (emails: string[]) => void
 }
 
-export function AvailabilityChecker({ selectedEmails, onSlotsFound }: AvailabilityCheckerProps) {
+export function AvailabilityChecker({ selectedEmails, onSlotsFound, onSuggestionsFound }: AvailabilityCheckerProps) {
   const [duration, setDuration] = useState(30)
   const [daysToCheck, setDaysToCheck] = useState(7)
   const [loading, setLoading] = useState(false)
@@ -53,9 +54,8 @@ export function AvailabilityChecker({ selectedEmails, onSlotsFound }: Availabili
 
       const data: AvailabilityResponse = await response.json()
       onSlotsFound(data.slots || [])
-      // Optional: surface suggestions to the parent via a custom event or store
-      if (data.suggestedTeammates?.length) {
-        console.log('Suggested teammates from calendars:', data.suggestedTeammates)
+      if (data.suggestedTeammates?.length && onSuggestionsFound) {
+        onSuggestionsFound(data.suggestedTeammates)
       }
       
       if (!data.slots || data.slots.length === 0) {

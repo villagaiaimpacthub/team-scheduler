@@ -6,15 +6,7 @@ export async function GET() {
     const session = await getServerSession();
 
     if (!session?.user?.email) {
-      // Fallback: attempt bootstrap and try again once
-      try {
-        const origin = process.env.NEXT_PUBLIC_APP_URL || ''
-        await fetch(`${origin}/api/bootstrap-team`, { method: 'POST' })
-      } catch {}
-      const retry = await getServerSession()
-      if (!retry?.user?.email) {
-        return NextResponse.json({ error: "Not authenticated" }, { status: 401 })
-      }
+      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     // Get team members using the utility function

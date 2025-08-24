@@ -24,7 +24,7 @@ export function EmailTeamBuilder({ domain, members, onAdd, onRemove }: EmailTeam
 
   const isValidEmail = (email: string) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 
-  const handleAdd = () => {
+  const handleAdd = async () => {
     const email = inputEmail.trim().toLowerCase()
     if (!isValidEmail(email)) {
       setError('Enter a valid email address')
@@ -38,6 +38,13 @@ export function EmailTeamBuilder({ domain, members, onAdd, onRemove }: EmailTeam
       setError('Already added')
       return
     }
+    try {
+      await fetch('/api/team-members/add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      })
+    } catch {}
     onAdd(email)
     setInputEmail('')
     setError(null)
@@ -73,7 +80,10 @@ export function EmailTeamBuilder({ domain, members, onAdd, onRemove }: EmailTeam
             <span key={email} className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs bg-[var(--muted)] text-[var(--foreground)]">
               {email}
               {onRemove && (
-                <button aria-label={`Remove ${email}`} onClick={() => onRemove(email)} className="ml-1">
+                <button aria-label={`Remove ${email}`} onClick={async () => {
+                  try { await fetch(`/api/team-members/${email}`, { method: 'DELETE' }) } catch {}
+                  onRemove(email)
+                }} className="ml-1">
                   <Icon name="X" className="h-3 w-3" />
                 </button>
               )}

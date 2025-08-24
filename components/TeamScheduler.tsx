@@ -33,6 +33,7 @@ export function TeamScheduler() {
   const [bookingResult, setBookingResult] = useState<BookingResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [manualEmails, setManualEmails] = useState<string[]>([])
+  const [suggested, setSuggested] = useState<string[]>([])
 
   const handleBooking = async (slot: TimeSlot, title: string, description?: string) => {
     try {
@@ -147,8 +148,28 @@ export function TeamScheduler() {
               setAvailableSlots(slots)
               setError(null)
             }}
+            onSuggestionsFound={(emails) => setSuggested(emails)}
           />
         </div>
+        {suggested.length > 0 && (
+          <div className="rounded-lg border p-4 bg-[var(--card)] text-[var(--card-foreground)] border-[color:var(--border)]">
+            <h4 className="font-semibold mb-2">Discovered colleagues in your calendars</h4>
+            <div className="flex flex-wrap gap-2">
+              {suggested.map((email) => (
+                <span key={email} className="inline-flex items-center gap-2 px-2 py-1 rounded-full text-xs bg-[var(--muted)] text-[var(--foreground)]">
+                  {email}
+                  <Button size="sm" variant="outline" onClick={async () => {
+                    try {
+                      await fetch('/api/team-members/add', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email }) })
+                      setManualEmails((prev) => Array.from(new Set([...prev, email])))
+                      setSuggested((prev) => prev.filter((e) => e !== email))
+                    } catch {}
+                  }}>Add</Button>
+                </span>
+              ))}
+            </div>
+          </div>
+        )}
         <div>
           {booking ? (
             <div className="flex items-center justify-center p-8">
