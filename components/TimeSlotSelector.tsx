@@ -64,7 +64,7 @@ export function TimeSlotSelector({ slots, duration, participants, onBooking }: T
               Selected: {formatDateTime(selectedSlot.start)}
             </p>
             <p className="text-xs text-[var(--muted-foreground)]">
-              Duration: {duration} minutes • {participants.length} participants
+              Duration: {duration} minutes • {participants.length + 1} participants
             </p>
           </div>
 
@@ -124,7 +124,7 @@ export function TimeSlotSelector({ slots, duration, participants, onBooking }: T
                       {formatDateTime(slot.start)}
                     </p>
                     <p className="text-xs text-[var(--muted-foreground)]">
-                      {duration} minutes • {participants.length} participants
+                      {duration} minutes • {participants.length + 1} participants
                     </p>
                   </div>
                 </div>
