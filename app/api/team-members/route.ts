@@ -2,6 +2,7 @@ import { Database } from "@/types/database.types";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -35,11 +36,31 @@ export async function GET(request: NextRequest) {
     }
 
     // Fetch teammates via RPC using the same request-bound client
-    const { data: teammates, error: tmError } = await supabase.rpc('get_team_members', {
+    let { data: teammates, error: tmError } = await supabase.rpc('get_team_members', {
       user_email: user.email,
     })
+    // Fallback: if RPC missing or RLS blocks, query by domain using service role
     if (tmError) {
-      return NextResponse.json({ error: 'Failed to load team members' }, { status: 500 })
+      try {
+        const domain = user.email.split('@')[1]
+        const admin = createClient<Database>(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!,
+          { auth: { persistSession: false } }
+        )
+        const { data: fallback, error: fbErr } = await admin
+          .from('users')
+          .select('id,name,email,image_url,domain')
+          .eq('domain', domain)
+          .neq('email', user.email)
+          .order('name', { ascending: true })
+        if (fbErr) {
+          return NextResponse.json({ error: 'Failed to load team members' }, { status: 500 })
+        }
+        teammates = fallback as any
+      } catch {
+        return NextResponse.json({ error: 'Failed to load team members' }, { status: 500 })
+      }
     }
 
     // Also check if company domain filter is set
