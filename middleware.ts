@@ -3,8 +3,38 @@ import type { NextRequest } from 'next/server'
 import { updateSession } from '@/lib/supabase-server'
 
 export async function middleware(request: NextRequest) {
-  // Update session for Supabase Auth
-  return await updateSession(request)
+  // Generate per-request nonce (Edge-safe)
+  const array = new Uint8Array(16)
+  crypto.getRandomValues(array)
+  const nonce = btoa(String.fromCharCode(...array))
+
+  // Update session first (propagate auth cookies)
+  let response = await updateSession(request)
+
+  // Build strict CSP with nonce and strict-dynamic
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
+  const csp = [
+    `default-src 'self'`,
+    // Only trust scripts with this nonce; allow dynamic child scripts from trusted ones
+    `script-src 'self' 'nonce-${nonce}' 'strict-dynamic'`,
+    // Styles (Tailwind injects styles via CSS files; allow inline for safety)
+    `style-src 'self' 'unsafe-inline'`,
+    // Images/fonts may load from CDNs
+    `img-src 'self' data: blob: https:`,
+    `font-src 'self' data: https:`,
+    // Network calls
+    `connect-src 'self' ${supabaseUrl} https://*.supabase.co https://*.supabase.in https://www.googleapis.com https://accounts.google.com`,
+    // OAuth frames
+    `frame-src https://accounts.google.com`,
+    // Embedding allowed
+    `frame-ancestors *`,
+    `base-uri 'self'`,
+    `form-action 'self' ${supabaseUrl} https://accounts.google.com`,
+  ].join('; ')
+
+  response.headers.set('Content-Security-Policy', csp)
+  response.headers.set('x-nonce', nonce)
+  return response
 }
 
 export const config = {

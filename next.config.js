@@ -1,19 +1,5 @@
 /** @type {import('next').NextConfig} */
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
-const csp = `
-  default-src 'self';
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:;
-  script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' https: data: blob:;
-  script-src-attr 'unsafe-inline';
-  style-src 'self' 'unsafe-inline' https:;
-  img-src * data: blob:;
-  font-src * data:;
-  connect-src 'self' ${supabaseUrl} https: wss:;
-  frame-src *;
-  frame-ancestors *;
-  base-uri 'self';
-  form-action 'self' ${supabaseUrl} https:;
-`.replace(/\n/g, ' ')
+// CSP is set via middleware with a per-request nonce
 
 const nextConfig = {
   experimental: {
@@ -32,16 +18,6 @@ const nextConfig = {
     GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
     GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
     COMPANY_DOMAIN: process.env.COMPANY_DOMAIN
-  },
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          { key: 'Content-Security-Policy', value: csp },
-        ],
-      },
-    ]
   },
 }
 
