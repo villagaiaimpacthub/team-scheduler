@@ -3,61 +3,37 @@ import type { NextRequest } from 'next/server'
 import { updateSession } from '@/lib/supabase-server'
 
 export async function middleware(request: NextRequest) {
-  // Generate per-request nonce (Edge-safe)
-  const array = new Uint8Array(16)
-  crypto.getRandomValues(array)
-  const nonce = btoa(String.fromCharCode(...array))
-
-  // Ensure Next receives nonce via request headers (so it can nonce inline scripts)
-  const requestHeaders = new Headers(request.headers)
-  requestHeaders.set('x-nonce', nonce)
-
   // Update session first (propagate auth cookies)
   const sessionResponse = await updateSession(request)
-  // Create a fresh response with modified request headers
-  let response = NextResponse.next({
-    request: { headers: requestHeaders },
-  })
+
+  // Create a fresh response
+  let response = NextResponse.next()
   // Copy cookies set by updateSession onto the new response
   sessionResponse.cookies.getAll().forEach((cookie) => {
     response.cookies.set(cookie)
   })
 
-  // Build strict CSP with nonce and strict-dynamic
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
   const csp = [
     `default-src 'self'`,
-    // Allow Next inline bootstrap via 'unsafe-inline' and nonce; allow same-origin and Google hosts
-    `script-src 'self' 'nonce-${nonce}' 'unsafe-inline' https://accounts.google.com https://www.gstatic.com https://apis.google.com`,
-    // Styles (Tailwind injects styles via CSS files; allow inline for safety)
+    // Pragmatic allowlist: allow inline + same-origin + Google auth hosts
+    `script-src 'self' 'unsafe-inline' https://accounts.google.com https://www.gstatic.com https://apis.google.com`,
     `style-src 'self' 'unsafe-inline'`,
-    // Images/fonts may load from CDNs
     `img-src 'self' data: blob: https:`,
     `font-src 'self' data: https:`,
-    // Network calls
     `connect-src 'self' ${supabaseUrl} https://*.supabase.co https://*.supabase.in https://www.googleapis.com https://accounts.google.com`,
-    // OAuth frames
     `frame-src https://accounts.google.com`,
-    // Embedding allowed
     `frame-ancestors *`,
     `base-uri 'self'`,
     `form-action 'self' ${supabaseUrl} https://accounts.google.com`,
   ].join('; ')
 
   response.headers.set('Content-Security-Policy', csp)
-  response.headers.set('x-nonce', nonce)
   return response
 }
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - public (public files)
-     */
     '/((?!_next/static|_next/image|favicon.ico|public|.*\\..*$).*)',
   ],
 }
