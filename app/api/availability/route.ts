@@ -1,4 +1,4 @@
-import { getCalendarServiceWithToken, findAvailableSlotsWithService } from "@/lib/google-calendar"
+import { getCalendarServiceWithToken } from "@/lib/google-calendar"
 import { createClient } from "@supabase/supabase-js"
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
@@ -61,45 +61,87 @@ export async function POST(request: NextRequest) {
         ...(debug ? { details: selfTokErr?.message || 'no token for current user' } : {}),
       }, { status: 403 })
     }
-    const service = getCalendarServiceWithToken(selfToken.access_token)
+    // Build tokens for ALL participants using service-role (each user’s own token)
+    const { data: usersForEmails } = await admin
+      .from('users')
+      .select('id,email')
+      .in('email', allEmails)
 
-    // Find available slots using the service
-    let slots
+    const emailToUserId = new Map<string, string>()
+    for (const u of usersForEmails || []) emailToUserId.set(u.email, u.id)
+
+    const tokenRows: Record<string, { access_token: string; expires_at: string | null }> = {}
+    if ((usersForEmails || []).length) {
+      const { data: rows } = await admin
+        .from('google_tokens')
+        .select('user_id,access_token,expires_at')
+        .in('user_id', (usersForEmails || []).map(u => u.id))
+      for (const r of rows || []) tokenRows[r.user_id] = { access_token: r.access_token, expires_at: r.expires_at as any }
+    }
+
+    const missing: string[] = []
+    const services: Record<string, ReturnType<typeof getCalendarServiceWithToken>> = {}
+    for (const email of allEmails) {
+      const uid = emailToUserId.get(email)
+      const tok = uid ? tokenRows[uid]?.access_token : undefined
+      if (!tok) missing.push(email)
+      else services[email] = getCalendarServiceWithToken(tok)
+    }
+    if (missing.length) {
+      return NextResponse.json({
+        error: 'Missing calendar consent for participants',
+        missing,
+        hint: 'Ask these users to sign in once to grant calendar access.',
+        ...(debug ? { debug: { who: user.email, participants: allEmails } } : {}),
+      }, { status: 403 })
+    }
+
+    // Compute free slot intersection across all participants
+    const now = new Date()
+    const endDate = new Date(now.getTime() + daysToCheck * 24 * 60 * 60 * 1000)
+    const busyMap: Record<string, { start: string; end: string }[]> = {}
     try {
-      slots = await findAvailableSlotsWithService({
-        calendarService: service,
-        emails: allEmails,
-        duration,
-        daysToCheck,
-      })
+      for (const email of allEmails) {
+        const svc = services[email]
+        const fb = await svc.getFreeBusyInfo(now.toISOString(), endDate.toISOString(), [email])
+        busyMap[email] = fb[email] || []
+      }
     } catch (e: any) {
       return NextResponse.json({
         error: 'Calendar free/busy failed',
-        hint: 'Verify Calendar API enabled and that selected users granted access or domain free/busy is visible.',
-        who: user.email,
-        ...(debug ? { details: String(e?.message || e) } : {}),
+        details: debug ? String(e?.message || e) : undefined,
       }, { status: 502 })
     }
 
-    // Just-in-time discovery from current events within the window
-    const calendarService = service
-    const now = new Date()
-    const endDate = new Date(now.getTime() + daysToCheck * 24 * 60 * 60 * 1000)
-    const events = calendarService
-      ? await calendarService.listUserEventsWithAttendees(now.toISOString(), endDate.toISOString())
-      : []
-
-    const companyDomain = process.env.COMPANY_DOMAIN
-    const discoveredSet = new Set<string>()
-    for (const ev of events) {
-      ev.attendees?.forEach((a) => {
-        const email = a.email?.toLowerCase()
-        if (!email) return
-        if (companyDomain && !email.endsWith(`@${companyDomain}`)) return
-        if (!allEmails.map((e) => e.toLowerCase()).includes(email)) {
-          discoveredSet.add(email)
+    const businessHours = { start: 9, end: 17 }
+    const slotDurationMs = duration * 60 * 1000
+    const slots: Array<{ start: string; end: string }> = []
+    for (let d = 0; d < daysToCheck; d++) {
+      const checkDate = new Date(now)
+      checkDate.setDate(checkDate.getDate() + d)
+      if (checkDate.getDay() === 0 || checkDate.getDay() === 6) continue
+      for (let hour = businessHours.start; hour < businessHours.end; hour++) {
+        for (let minute = 0; minute < 60; minute += 30) {
+          const slotStart = new Date(checkDate)
+          slotStart.setHours(hour, minute, 0, 0)
+          const slotEnd = new Date(slotStart.getTime() + slotDurationMs)
+          if (slotStart < now) continue
+          if (slotEnd.getHours() >= businessHours.end) break
+          let freeForAll = true
+          for (const email of allEmails) {
+            const conflicts = (busyMap[email] || []).some((b) => {
+              const bs = new Date(b.start); const be = new Date(b.end)
+              return (slotStart >= bs && slotStart < be) || (slotEnd > bs && slotEnd <= be) || (slotStart <= bs && slotEnd >= be)
+            })
+            if (conflicts) { freeForAll = false; break }
+          }
+          if (freeForAll) {
+            slots.push({ start: slotStart.toISOString(), end: slotEnd.toISOString() })
+            if (slots.length >= 10) break
+          }
         }
-      })
+      }
+      if (slots.length >= 10) break
     }
 
     return NextResponse.json({
@@ -107,7 +149,7 @@ export async function POST(request: NextRequest) {
       participants: allEmails,
       duration,
       daysChecked: daysToCheck,
-      suggestedTeammates: Array.from(discoveredSet),
+      suggestedTeammates: [],
       ...(debug ? { debug: { who: user.email, participants: allEmails } } : {}),
     })
   } catch (error) {

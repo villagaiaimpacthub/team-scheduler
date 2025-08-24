@@ -1,6 +1,7 @@
 'use client'
 
 import { MeetingsList } from './MeetingsList'
+import { GoogleCalendarView } from '@/components/GoogleCalendarView'
 import { useAuth } from '../providers'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
@@ -34,6 +35,9 @@ export default function MeetingsPage() {
         <p className="text-[var(--muted-foreground)]">View and manage your scheduled team meetings</p>
       </div>
       
+      <div className="mb-6">
+        <GoogleCalendarView />
+      </div>
       <MeetingsList />
     </div>
   )
