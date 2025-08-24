@@ -8,8 +8,20 @@ export async function middleware(request: NextRequest) {
   crypto.getRandomValues(array)
   const nonce = btoa(String.fromCharCode(...array))
 
+  // Ensure Next receives nonce via request headers (so it can nonce inline scripts)
+  const requestHeaders = new Headers(request.headers)
+  requestHeaders.set('x-nonce', nonce)
+
   // Update session first (propagate auth cookies)
-  let response = await updateSession(request)
+  const sessionResponse = await updateSession(request)
+  // Create a fresh response with modified request headers
+  let response = NextResponse.next({
+    request: { headers: requestHeaders },
+  })
+  // Copy cookies set by updateSession onto the new response
+  sessionResponse.cookies.getAll().forEach((cookie) => {
+    response.cookies.set(cookie)
+  })
 
   // Build strict CSP with nonce and strict-dynamic
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
