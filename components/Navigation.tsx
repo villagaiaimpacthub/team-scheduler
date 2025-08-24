@@ -13,7 +13,7 @@ export function Navigation() {
   }
 
   return (
-    <nav className="bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800">
+    <nav className="bg-[var(--background)] text-[var(--foreground)] border-b border-[color:var(--border)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -25,13 +25,13 @@ export function Navigation() {
             <div className="ml-10 flex items-baseline space-x-4">
               <Link
                 href="/"
-                className="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium"
+                className="text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-3 py-2 rounded-md text-sm font-medium"
               >
                 Schedule
               </Link>
               <Link
                 href="/meetings"
-                className="text-gray-500 dark:text-gray-300 hover:text-gray-700 dark:hover:text-white px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1"
+                className="text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1"
               >
                 <Icon name="Calendar" className="h-4 w-4" />
                 My Meetings

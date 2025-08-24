@@ -28,9 +28,14 @@ export default function HomePage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md border border-gray-200 dark:border-gray-700 p-6 w-full max-w-md">
-        <TeamScheduler />
+    <div className="min-h-screen p-4">
+      <div className="space-y-6">
+        <div className="rounded-lg shadow-md border p-6 bg-[var(--card)] text-[var(--card-foreground)] border-[color:var(--border)]">
+          <TeamScheduler />
+        </div>
+        <div className="rounded-lg shadow-md border p-6 bg-[var(--card)] text-[var(--card-foreground)] border-[color:var(--border)]">
+          {/* Availability card remains full width */}
+        </div>
       </div>
     </div>
   )

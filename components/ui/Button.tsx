@@ -13,12 +13,12 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500',
-        secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500',
-        success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500',
-        danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
-        outline: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-primary-500',
-        ghost: 'bg-transparent hover:bg-gray-100',
+        default: 'bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90 focus:ring-[color:var(--ring)]',
+        secondary: 'bg-[var(--secondary)] text-[var(--secondary-foreground)] hover:opacity-95 focus:ring-[color:var(--ring)]',
+        success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-[color:var(--ring)]',
+        danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-[color:var(--ring)]',
+        outline: 'border border-[color:var(--border)] bg-[var(--background)] text-[var(--foreground)] hover:bg-[var(--muted)] focus:ring-[color:var(--ring)]',
+        ghost: 'bg-transparent hover:bg-[var(--muted)]',
       },
       size: {
         sm: 'px-3 py-1.5 text-sm rounded-md',
