@@ -10,6 +10,10 @@ interface TimeSlot {
   end: string
 }
 
+interface AvailabilityResponse {
+  slots: TimeSlot[]
+  suggestedTeammates?: string[]
+}
 interface AvailabilityCheckerProps {
   selectedEmails: string[]
   onSlotsFound: (slots: TimeSlot[]) => void
@@ -47,8 +51,12 @@ export function AvailabilityChecker({ selectedEmails, onSlotsFound }: Availabili
         throw new Error('Failed to check availability')
       }
 
-      const data = await response.json()
+      const data: AvailabilityResponse = await response.json()
       onSlotsFound(data.slots || [])
+      // Optional: surface suggestions to the parent via a custom event or store
+      if (data.suggestedTeammates?.length) {
+        console.log('Suggested teammates from calendars:', data.suggestedTeammates)
+      }
       
       if (!data.slots || data.slots.length === 0) {
         setError('No common available times found. Try extending the search period or selecting fewer people.')

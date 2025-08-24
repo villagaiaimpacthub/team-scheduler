@@ -72,6 +72,40 @@ export class GoogleCalendarService {
   }
 
   /**
+   * List events for current user with attendees within a date range
+   */
+  async listUserEventsWithAttendees(
+    timeMin: string,
+    timeMax: string
+  ): Promise<CalendarEvent[]> {
+    try {
+      const response = await this.calendar.events.list({
+        calendarId: "primary",
+        timeMin,
+        timeMax,
+        singleEvents: true,
+        orderBy: "startTime",
+        maxResults: 250,
+      });
+
+      const events = (response.data.items || []).map((e: any) => ({
+        id: e.id,
+        summary: e.summary,
+        description: e.description,
+        start: { dateTime: e.start?.dateTime || e.start?.date },
+        end: { dateTime: e.end?.dateTime || e.end?.date },
+        attendees: (e.attendees || []).map((a: any) => ({ email: a.email, responseStatus: a.responseStatus })),
+        hangoutLink: e.hangoutLink,
+      })) as CalendarEvent[];
+
+      return events;
+    } catch (error) {
+      console.error("Error listing events with attendees:", error);
+      return [];
+    }
+  }
+
+  /**
    * Create a calendar event
    */
   async createEvent(event: Omit<CalendarEvent, "id">): Promise<CalendarEvent> {
