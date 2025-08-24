@@ -26,9 +26,19 @@ export function GoogleCalendarView({ onEventSelect }: { onEventSelect?: (event: 
   useEffect(() => {
     if (!range) return
     const load = async () => {
-      const res = await fetch(`/api/events?start=${encodeURIComponent(range.start)}&end=${encodeURIComponent(range.end)}`, { cache: 'no-store', credentials: 'include' })
-      const json = await res.json()
-      if (res.ok) setEvents(json.events || [])
+      try {
+        console.log('[calendar] fetching events', range)
+        const res = await fetch(`/api/events?start=${encodeURIComponent(range.start)}&end=${encodeURIComponent(range.end)}`, { cache: 'no-store', credentials: 'include' })
+        const json = await res.json()
+        if (!res.ok) {
+          console.error('[calendar] events error', json)
+          return
+        }
+        console.log('[calendar] events loaded', (json.events || []).length)
+        setEvents(json.events || [])
+      } catch (e) {
+        console.error('[calendar] fetch failed', e)
+      }
     }
     load()
   }, [range])
@@ -81,7 +91,11 @@ export function GoogleCalendarView({ onEventSelect }: { onEventSelect?: (event: 
           headerToolbar={false}
           height="auto"
           events={events}
-          datesSet={(arg) => setRange({ start: arg.startStr, end: arg.endStr })}
+          datesSet={(arg) => {
+            const next = { start: arg.startStr, end: arg.endStr }
+            console.log('[calendar] datesSet', next)
+            setRange(next)
+          }}
           displayEventTime
           eventTimeFormat={{ hour: 'numeric', minute: '2-digit', meridiem: true }}
           themeSystem="standard"

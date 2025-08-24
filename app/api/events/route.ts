@@ -20,9 +20,7 @@ export async function GET(request: NextRequest) {
     const start = request.nextUrl.searchParams.get('start')
     const end = request.nextUrl.searchParams.get('end')
     if (!start || !end) return NextResponse.json({ error: 'Missing start/end' }, { status: 400 })
-    // Normalize range to avoid off-by-one issues for month view
-    const startIso = new Date(start).toISOString()
-    const endIso = new Date(end).toISOString()
+    console.log('[events] range', { start, end })
 
     // Service-role to get token
     const admin = createClient<Database>(
@@ -38,7 +36,8 @@ export async function GET(request: NextRequest) {
     if (!tok?.access_token) return NextResponse.json({ error: 'No calendar access' }, { status: 403 })
 
     const svc = getCalendarServiceWithToken(tok.access_token)
-    const list = await svc.listUserEventsWithAttendees(startIso, endIso)
+    const list = await svc.listUserEventsWithAttendees(start, end)
+    console.log('[events] fetched count', list?.length || 0)
 
     // Map to FullCalendar event format
     const events = (list || []).map(e => {
@@ -55,6 +54,7 @@ export async function GET(request: NextRequest) {
         allDay: startIso?.length <= 10 || endIso?.length <= 10,
       }
     })
+    console.log('[events] returning', events.length)
 
     return NextResponse.json({ events })
   } catch (e: any) {
