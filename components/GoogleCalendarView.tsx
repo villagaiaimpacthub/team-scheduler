@@ -22,11 +22,7 @@ export function GoogleCalendarView({ onEventSelect }: { onEventSelect?: (event: 
   const [view] = useState<'dayGridMonth'>('dayGridMonth')
   const calendarRef = useRef<FullCalendar | null>(null)
   const [tooltip, setTooltip] = useState<{ x: number; y: number; title: string; time: string } | null>(null)
-  const monthTitle = useMemo(() => {
-    if (!range?.start) return ''
-    const d = new Date(range.start)
-    return d.toLocaleString(undefined, { month: 'long', year: 'numeric' })
-  }, [range?.start])
+  const [monthTitle, setMonthTitle] = useState<string>('')
 
   useEffect(() => {
     if (!range) return
@@ -69,7 +65,7 @@ export function GoogleCalendarView({ onEventSelect }: { onEventSelect?: (event: 
 
   return (
     <Card className="space-y-3">
-      <div className="grid grid-cols-3 items-center">
+      <div className="flex flex-col gap-2 sm:grid sm:grid-cols-3 sm:items-center">
         <div className="flex items-center gap-2">
           <Button variant="outline" size="sm" onClick={onPrev}>
             <Icon name="ChevronLeft" className="h-4 w-4" />
@@ -97,10 +93,14 @@ export function GoogleCalendarView({ onEventSelect }: { onEventSelect?: (event: 
             const next = { start: arg.startStr, end: arg.endStr }
             console.log('[calendar] datesSet', next)
             setRange(next)
+            setMonthTitle(arg.view?.title || '')
           }}
           displayEventTime
           eventTimeFormat={{ hour: 'numeric', minute: '2-digit', meridiem: true }}
           themeSystem="standard"
+          timeZone="local"
+          firstDay={0}
+          dayHeaderFormat={{ weekday: 'short' }}
           dayMaxEventRows
           expandRows
           aspectRatio={1.2}
