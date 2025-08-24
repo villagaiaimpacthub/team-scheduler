@@ -36,28 +36,31 @@ export async function GET(request: NextRequest) {
     if (!tok?.access_token) return NextResponse.json({ error: 'No calendar access' }, { status: 403 })
 
     const svc = getCalendarServiceWithToken(tok.access_token)
+    const debug = request.nextUrl.searchParams.get('debug') === '1'
     let list = [] as any[]
     try {
       list = await svc.listUserEventsWithAttendees(start, end)
     } catch (err: any) {
-      console.error('[events] google error', err?.response?.data || err?.message || err)
-      return NextResponse.json({ error: 'Google list events failed' }, { status: 502 })
+      const details = err?.response?.data || err?.message || String(err)
+      console.error('[events] google error', details)
+      return NextResponse.json(
+        debug ? { error: 'Google list events failed', details } : { error: 'Google list events failed' },
+        { status: 502 }
+      )
     }
     console.log('[events] fetched count', list?.length || 0)
 
     // Map to FullCalendar event format
-    const events = (list || []).map(e => {
-      const startVal = (e.start?.dateTime as string) || ''
-      const endVal = (e.end?.dateTime as string) || ''
-      // Support all-day events where Google may return date without time
-      const startIso = startVal && startVal.length > 10 ? startVal : (e.start?.dateTime as string)
-      const endIso = endVal && endVal.length > 10 ? endVal : (e.end?.dateTime as string)
+    const events = (list || []).map((e: any) => {
+      const startVal: string | undefined = e.start?.dateTime || e.start?.date
+      const endVal: string | undefined = e.end?.dateTime || e.end?.date
+      const isAllDay = Boolean(e.start?.date && !e.start?.dateTime)
       return {
         id: e.id,
         title: e.summary || 'Busy',
-        start: startIso,
-        end: endIso,
-        allDay: startIso?.length <= 10 || endIso?.length <= 10,
+        start: startVal,
+        end: endVal,
+        allDay: isAllDay,
       }
     })
     console.log('[events] returning', events.length)

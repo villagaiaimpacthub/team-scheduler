@@ -29,7 +29,7 @@ export function GoogleCalendarView({ onEventSelect }: { onEventSelect?: (event: 
     const load = async () => {
       try {
         console.log('[calendar] fetching events', range)
-        const res = await fetch(`/api/events?start=${encodeURIComponent(range.start)}&end=${encodeURIComponent(range.end)}`, { cache: 'no-store', credentials: 'include' })
+        const res = await fetch(`/api/events?start=${encodeURIComponent(range.start)}&end=${encodeURIComponent(range.end)}&debug=1`, { cache: 'no-store', credentials: 'include' })
         const json = await res.json()
         if (!res.ok) {
           console.error('[calendar] events error', json)
