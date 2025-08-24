@@ -21,6 +21,11 @@ export function SignInForm() {
     
     if (error) {
       console.error('Error signing in:', error)
+    } else {
+      // After successful sign-in, bootstrap teammates from calendar
+      try {
+        await fetch('/api/bootstrap-team', { method: 'POST' })
+      } catch {}
     }
   }
 

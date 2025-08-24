@@ -117,7 +117,7 @@ export function TeamScheduler() {
           <Icon name="Users" className="h-8 w-8 text-primary-600" />
           <h1 className="text-3xl font-bold">Team Scheduler</h1>
         </div>
-        <p className="text-gray-600">Find and book team meetings with automatic calendar integration</p>
+        <p className="text-gray-600 dark:text-gray-300">Find and book team meetings with automatic calendar integration</p>
       </div>
 
       {error && (
