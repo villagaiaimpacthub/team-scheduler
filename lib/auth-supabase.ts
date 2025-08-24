@@ -29,14 +29,35 @@ export async function getServerSession(): Promise<AuthSession | null> {
   }
 
   // Get the user profile from our users table
-  const { data: userProfile, error: profileError } = await supabase
+  let { data: userProfile, error: profileError } = await supabase
     .from("users")
     .select("*")
     .eq("id", authUser.id)
     .single();
 
+  // If the profile doesn't exist yet (first login), create it on-the-fly
   if (profileError || !userProfile) {
-    return null;
+    const email = authUser.email || "";
+    const domain = email.includes("@") ? email.split("@")[1] : null;
+    await supabase
+      .from("users")
+      .upsert({
+        id: authUser.id,
+        email,
+        name: (authUser.user_metadata as any)?.full_name || (authUser.user_metadata as any)?.name || null,
+        image_url: (authUser.user_metadata as any)?.avatar_url || null,
+        domain: domain || null,
+      }, { onConflict: "id" });
+
+    const reselect = await supabase
+      .from("users")
+      .select("*")
+      .eq("id", authUser.id)
+      .single();
+    userProfile = reselect.data as any;
+    if (!userProfile) {
+      return null;
+    }
   }
 
   // Get Google tokens for calendar access
