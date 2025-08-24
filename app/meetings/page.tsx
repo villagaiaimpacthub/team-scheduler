@@ -4,11 +4,13 @@ import { MeetingsList } from './MeetingsList'
 import { GoogleCalendarView } from '@/components/GoogleCalendarView'
 import { useAuth } from '../providers'
 import { useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { Card } from '@/components/ui/Card'
 
 export default function MeetingsPage() {
   const { user, loading } = useAuth()
   const router = useRouter()
+  const [selectedEvent, setSelectedEvent] = useState<{ id: string; title: string; start: string; end: string; allDay?: boolean } | null>(null)
   
   useEffect(() => {
     if (!loading && !user) {
@@ -36,9 +38,21 @@ export default function MeetingsPage() {
       </div>
       
       <div className="mb-6">
-        <GoogleCalendarView />
+        <GoogleCalendarView onEventSelect={setSelectedEvent} />
       </div>
-      <MeetingsList />
+      {selectedEvent ? (
+        <Card>
+          <div className="p-4 space-y-1">
+            <h3 className="text-lg font-semibold">{selectedEvent.title}</h3>
+            <p className="text-sm text-[var(--muted-foreground)]">
+              {new Date(selectedEvent.start).toLocaleString()} — {selectedEvent.end ? new Date(selectedEvent.end).toLocaleString() : ''}
+              {selectedEvent.allDay ? ' (All day)' : ''}
+            </p>
+          </div>
+        </Card>
+      ) : (
+        <MeetingsList />
+      )}
     </div>
   )
 }

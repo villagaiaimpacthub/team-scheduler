@@ -8,7 +8,15 @@ import { Card } from './ui/Card'
 import { Button } from './ui/Button'
 import { Icon } from './ui/Icon'
 
-export function GoogleCalendarView() {
+interface SelectedEventPayload {
+  id: string
+  title: string
+  start: string
+  end: string
+  allDay?: boolean
+}
+
+export function GoogleCalendarView({ onEventSelect }: { onEventSelect?: (event: SelectedEventPayload) => void }) {
   const [events, setEvents] = useState<any[]>([])
   const [range, setRange] = useState<{ start: string; end: string } | null>(null)
   const [view] = useState<'dayGridMonth'>('dayGridMonth')
@@ -123,6 +131,17 @@ export function GoogleCalendarView() {
             el.style.boxShadow = ''
             el.style.filter = ''
             setTooltip(null)
+          }}
+          eventClick={(clickInfo) => {
+            const ev = clickInfo.event
+            const payload: SelectedEventPayload = {
+              id: ev.id,
+              title: ev.title,
+              start: ev.startStr,
+              end: ev.endStr,
+              allDay: ev.allDay,
+            }
+            onEventSelect?.(payload)
           }}
           contentHeight="auto"
         />
