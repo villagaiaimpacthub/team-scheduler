@@ -1,6 +1,7 @@
-import { getServerSession } from "@/lib/auth-supabase";
-import { getCalendarService } from "@/lib/google-calendar";
-import { createSupabaseServerClient } from "@/lib/supabase-server";
+import { getCalendarServiceWithToken } from "@/lib/google-calendar";
+import { createServerClient } from "@supabase/ssr";
+import { createClient } from "@supabase/supabase-js";
+import { Database } from "@/types/database.types";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -13,30 +14,44 @@ const bookingSchema = z.object({
   participants: z.array(z.string().email()),
 });
 
+export const runtime = 'nodejs'
+export const dynamic = 'force-dynamic'
+
 export async function POST(request: NextRequest) {
   try {
-    const session = await getServerSession();
-
-    if (!session?.user?.email || !session?.user?.id) {
+    const supabase = createServerClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { cookies: { get: (n) => request.cookies.get(n)?.value, set() {}, remove() {} } }
+    )
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user?.email || !(user as any).id) {
       return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
     }
 
     const body = await request.json();
     const { title, description, startTime, endTime, duration, participants } = bookingSchema.parse(body);
 
-    // Get calendar service
-    const calendarService = await getCalendarService();
-    if (!calendarService) {
-      return NextResponse.json(
-        { error: "No calendar access. Please reconnect your Google Calendar." },
-        { status: 401 }
-      );
+    // Get current user's Google token via service-role
+    const admin = createClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { persistSession: false } }
+    )
+    const { data: tokenRow, error: tokErr } = await admin
+      .from('google_tokens')
+      .select('access_token, expires_at')
+      .eq('user_id', (user as any).id)
+      .single()
+    if (tokErr || !tokenRow?.access_token) {
+      return NextResponse.json({ error: "No calendar access - please sign in" }, { status: 403 })
     }
+    const calendarService = getCalendarServiceWithToken(tokenRow.access_token)
 
     console.log("Creating meeting:", { title, startTime, endTime, participants });
 
     // Prepare attendees list (including organizer)
-    const allAttendees = [...participants, session.user.email];
+    const allAttendees = [...participants, user.email];
     const attendees = allAttendees.map((email) => ({ email }));
 
     // Create Google Calendar event
@@ -61,8 +76,11 @@ export async function POST(request: NextRequest) {
     console.log("Calendar event created:", calendarEvent.id);
 
     // Store meeting in database using Supabase
-    const supabase = await createSupabaseServerClient();
-    const { data: meeting, error: meetingError } = await supabase
+    const { data: meeting, error: meetingError } = await (createServerClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      { cookies: { get: (n) => request.cookies.get(n)?.value, set() {}, remove() {} } }
+    ))
       .from("meetings")
       .insert({
         title,
@@ -72,7 +90,7 @@ export async function POST(request: NextRequest) {
         duration,
         location: calendarEvent.hangoutLink || "",
         google_event_id: calendarEvent.id,
-        organizer_id: session.user.id,
+        organizer_id: (user as any).id,
         participants: JSON.stringify(participants),
       })
       .select()
