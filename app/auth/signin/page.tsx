@@ -1,12 +1,30 @@
-import { getServerSession } from '@/lib/auth-supabase'
-import { redirect } from 'next/navigation'
-import { SignInForm } from './SignInForm'
+'use client'
 
-export default async function SignInPage() {
-  const session = await getServerSession()
+import { SignInForm } from './SignInForm'
+import { useAuth } from '../../providers'
+import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
+
+export default function SignInPage() {
+  const { user, loading } = useAuth()
+  const router = useRouter()
   
-  if (session) {
-    redirect('/')
+  useEffect(() => {
+    if (!loading && user) {
+      router.push('/')
+    }
+  }, [user, loading, router])
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-spin h-8 w-8 border-4 border-primary-600 border-t-transparent rounded-full"></div>
+      </div>
+    )
+  }
+
+  if (user) {
+    return null
   }
 
   return (
