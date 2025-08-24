@@ -29,9 +29,13 @@ export async function getServerSession(): Promise<AuthSession | null> {
       const base = `sb-${projectRef}-auth-token`;
       const c0 = cookieStore.get(`${base}.0`)?.value;
       const c1 = cookieStore.get(`${base}.1`)?.value;
-      const raw = c0 && c1 ? c0 + c1 : c0 || c1 || cookieStore.get(base)?.value;
+      // Supabase splits long cookie values into .0 and .1 and prefixes first part with 'base64-'
+      const part0 = c0 ? (c0.startsWith('base64-') ? c0.slice(7) : c0) : '';
+      const part1 = c1 || '';
+      const raw = (part0 + part1) || cookieStore.get(base)?.value || '';
       if (!raw) return;
-      const json = JSON.parse(Buffer.from(raw, 'base64').toString('utf-8')) as any;
+      const decoded = Buffer.from(raw, 'base64').toString('utf-8');
+      const json = JSON.parse(decoded) as any;
       const access_token = json?.access_token;
       const refresh_token = json?.refresh_token;
       const expires_in = json?.expires_in;
