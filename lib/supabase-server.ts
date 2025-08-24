@@ -18,7 +18,19 @@ export async function createSupabaseServerClient() {
   return createServerClient<Database>(supabaseUrl!, supabaseAnonKey!, {
     cookies: {
       get(name: string) {
-        return cookieStore.get(name)?.value;
+        // Supabase splits long auth cookie into `.0` and `.1` with base64- prefix in part 0
+        const direct = cookieStore.get(name)?.value;
+        if (direct) return direct;
+        if (name.includes("-auth-token")) {
+          const part0 = cookieStore.get(`${name}.0`)?.value;
+          const part1 = cookieStore.get(`${name}.1`)?.value;
+          if (part0 || part1) {
+            const p0 = part0 ? (part0.startsWith('base64-') ? part0.slice(7) : part0) : '';
+            const p1 = part1 || '';
+            return `base64-${p0}${p1}`;
+          }
+        }
+        return undefined;
       },
       set(name: string, value: string, options: any) {
         cookieStore.set({ name, value, ...options });
