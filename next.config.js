@@ -2,12 +2,14 @@
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || ''
 const csp = `
   default-src 'self';
-  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://accounts.google.com;
+  script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://accounts.google.com https://*.google.com https://*.gstatic.com https://*.googleusercontent.com;
+  script-src-elem 'self' 'unsafe-inline' 'unsafe-eval' https://www.gstatic.com https://accounts.google.com https://*.google.com https://*.gstatic.com https://*.googleusercontent.com;
+  script-src-attr 'unsafe-inline';
   style-src 'self' 'unsafe-inline';
   img-src 'self' data: blob: https:;
   font-src 'self' data:;
-  connect-src 'self' ${supabaseUrl} https://*.supabase.co https://*.supabase.in https://www.googleapis.com https://accounts.google.com;
-  frame-src 'self' https://accounts.google.com;
+  connect-src 'self' ${supabaseUrl} https://*.supabase.co https://*.supabase.in https://www.googleapis.com https://accounts.google.com https://*.google.com https://*.gstatic.com https://*.googleusercontent.com;
+  frame-src 'self' https://accounts.google.com https://*.google.com https://*.googleusercontent.com;
   frame-ancestors *;
   base-uri 'self';
   form-action 'self' ${supabaseUrl} https://*.supabase.co https://accounts.google.com;
