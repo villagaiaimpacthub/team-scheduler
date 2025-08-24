@@ -36,7 +36,13 @@ export async function GET(request: NextRequest) {
     if (!tok?.access_token) return NextResponse.json({ error: 'No calendar access' }, { status: 403 })
 
     const svc = getCalendarServiceWithToken(tok.access_token)
-    const list = await svc.listUserEventsWithAttendees(start, end)
+    let list = [] as any[]
+    try {
+      list = await svc.listUserEventsWithAttendees(start, end)
+    } catch (err: any) {
+      console.error('[events] google error', err?.response?.data || err?.message || err)
+      return NextResponse.json({ error: 'Google list events failed' }, { status: 502 })
+    }
     console.log('[events] fetched count', list?.length || 0)
 
     // Map to FullCalendar event format

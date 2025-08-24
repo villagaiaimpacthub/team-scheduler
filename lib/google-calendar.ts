@@ -101,7 +101,7 @@ export class GoogleCalendarService {
       return events;
     } catch (error) {
       console.error("Error listing events with attendees:", error);
-      return [];
+      throw error;
     }
   }
 

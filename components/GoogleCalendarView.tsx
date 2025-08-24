@@ -65,20 +65,22 @@ export function GoogleCalendarView({ onEventSelect }: { onEventSelect?: (event: 
 
   return (
     <Card className="space-y-3">
-      <div className="flex flex-col gap-2 sm:grid sm:grid-cols-3 sm:items-center">
-        <div className="flex items-center gap-2">
-          <Button variant="outline" size="sm" onClick={onPrev}>
-            <Icon name="ChevronLeft" className="h-4 w-4" />
-          </Button>
-          <Button variant="outline" size="sm" onClick={onNext}>
-            <Icon name="ChevronRight" className="h-4 w-4" />
-          </Button>
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex items-center gap-2 order-2 sm:order-1">
+          <Button variant="secondary" size="sm" onClick={onMonth} aria-label="Switch to month view">Month</Button>
           <Button variant="secondary" size="sm" onClick={onToday}>
             <Icon name="Calendar" className="h-4 w-4 mr-1" /> Today
           </Button>
         </div>
-        <div className="text-center text-base font-semibold tracking-tight">{monthTitle}</div>
-        <div className="flex justify-end"><Button variant="outline" size="sm" onClick={onMonth} aria-label="Switch to month view">Month</Button></div>
+        <div className="flex items-center gap-3 order-1 sm:order-2">
+          <button onClick={onPrev} aria-label="Previous month" className="rounded-md px-2 py-1 hover:bg-[color:var(--muted)]/40">
+            <Icon name="ChevronLeft" className="h-5 w-5" />
+          </button>
+          <div className="text-lg font-semibold tracking-tight min-w-[10ch] text-center">{monthTitle}</div>
+          <button onClick={onNext} aria-label="Next month" className="rounded-md px-2 py-1 hover:bg-[color:var(--muted)]/40">
+            <Icon name="ChevronRight" className="h-5 w-5" />
+          </button>
+        </div>
       </div>
 
       <div className="relative rounded-md border border-[color:var(--border)]">
