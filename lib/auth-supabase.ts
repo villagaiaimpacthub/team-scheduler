@@ -1,6 +1,7 @@
 import { User } from "@/types/database.types";
 
 import { createSupabaseServerClient } from "./supabase-server";
+import { cookies } from "next/headers";
 
 export interface AuthSession {
   user: User & {
@@ -18,6 +19,28 @@ export interface AuthSession {
 export async function getServerSession(): Promise<AuthSession | null> {
   const supabase = await createSupabaseServerClient();
 
+  // Try to materialize session from sb-* cookies if getUser() is null
+  const primeSessionFromCookies = async () => {
+    try {
+      const cookieStore = await cookies();
+      const refMatch = (process.env.NEXT_PUBLIC_SUPABASE_URL || "").match(/https?:\/\/([a-z0-9]+)\.supabase\./i);
+      const projectRef = refMatch ? refMatch[1] : undefined;
+      if (!projectRef) return;
+      const base = `sb-${projectRef}-auth-token`;
+      const c0 = cookieStore.get(`${base}.0`)?.value;
+      const c1 = cookieStore.get(`${base}.1`)?.value;
+      const raw = c0 && c1 ? c0 + c1 : c0 || c1 || cookieStore.get(base)?.value;
+      if (!raw) return;
+      const json = JSON.parse(Buffer.from(raw, 'base64').toString('utf-8')) as any;
+      const access_token = json?.access_token;
+      const refresh_token = json?.refresh_token;
+      const expires_in = json?.expires_in;
+      if (access_token && refresh_token) {
+        await supabase.auth.setSession({ access_token, refresh_token });
+      }
+    } catch {}
+  };
+
   // Get the authenticated user from Supabase Auth
   let {
     data: { user: authUser },
@@ -25,6 +48,7 @@ export async function getServerSession(): Promise<AuthSession | null> {
 
   // Fallback to session if getUser is null (some hosting contexts)
   if (!authUser) {
+    await primeSessionFromCookies();
     const { data: sessionData } = await supabase.auth.getSession();
     authUser = (sessionData?.session as any)?.user || null;
     if (!authUser) {
