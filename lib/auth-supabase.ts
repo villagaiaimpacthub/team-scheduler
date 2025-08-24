@@ -19,13 +19,17 @@ export async function getServerSession(): Promise<AuthSession | null> {
   const supabase = await createSupabaseServerClient();
 
   // Get the authenticated user from Supabase Auth
-  const {
+  let {
     data: { user: authUser },
-    error: authError,
   } = await supabase.auth.getUser();
 
-  if (authError || !authUser) {
-    return null;
+  // Fallback to session if getUser is null (some hosting contexts)
+  if (!authUser) {
+    const { data: sessionData } = await supabase.auth.getSession();
+    authUser = (sessionData?.session as any)?.user || null;
+    if (!authUser) {
+      return null;
+    }
   }
 
   // Get the user profile from our users table
