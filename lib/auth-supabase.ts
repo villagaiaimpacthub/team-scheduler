@@ -1,6 +1,7 @@
 import { User } from "@/types/database.types";
 
 import { createSupabaseServerClient } from "./supabase-server";
+import { createClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 
 export interface AuthSession {
@@ -39,8 +40,11 @@ export async function getServerSession(): Promise<AuthSession | null> {
       const access_token = json?.access_token as string | undefined;
       const refresh_token = json?.refresh_token as string | undefined;
       if (access_token) {
-        // Prefer direct getUser(access_token) which doesn't rely on internal session state
-        const { data: direct } = await supabase.auth.getUser(access_token);
+        // Use a plain client for direct getUser(access_token)
+        const url = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
+        const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
+        const plain = createClient(url, anon);
+        const { data: direct } = await plain.auth.getUser(access_token);
         if (direct?.user) {
           return { user: direct.user } as any;
         }
