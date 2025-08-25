@@ -45,34 +45,19 @@ export async function POST(request: NextRequest) {
     const allEmails = Array.from(new Set([...emails, user.email].map((e) => e.toLowerCase())))
 
     // Use a plain service-role client to reliably read the current user's token
-    const useServiceRole = Boolean(process.env.SUPABASE_SERVICE_ROLE_KEY)
-    const admin = useServiceRole
-      ? createClient<Database>(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.SUPABASE_SERVICE_ROLE_KEY!,
-          { auth: { persistSession: false } }
-        )
-      : null as any
-    let selfToken: any = null
-    let selfTokErr: any = null
-    if (useServiceRole) {
-      const resp = await admin
-        .from('google_tokens')
-        .select('access_token, expires_at')
-        .eq('user_id', (user as any).id)
-        .single()
-      selfToken = resp.data
-      selfTokErr = resp.error
-    } else {
-      // Fallback: read current user's token via RLS (no service role)
-      const resp = await supabase
-        .from('google_tokens')
-        .select('access_token, expires_at')
-        .eq('user_id', (user as any).id)
-        .single()
-      selfToken = resp.data
-      selfTokErr = resp.error
+    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      return NextResponse.json({ error: 'Server misconfigured', hint: 'Missing SUPABASE_SERVICE_ROLE_KEY env var' }, { status: 500 })
     }
+    const admin = createClient<Database>(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!,
+      { auth: { persistSession: false } }
+    )
+    const { data: selfToken, error: selfTokErr } = await admin
+      .from('google_tokens')
+      .select('access_token, expires_at')
+      .eq('user_id', (user as any).id)
+      .single()
     if (selfTokErr || !selfToken?.access_token) {
       return NextResponse.json({
         error: 'No Google Calendar access',
@@ -82,28 +67,21 @@ export async function POST(request: NextRequest) {
       }, { status: 403 })
     }
     // Build tokens for ALL participants using service-role (each user’s own token)
-    const { data: usersForEmails } = useServiceRole
-      ? await admin
-          .from('users')
-          .select('id,email')
-          .in('email', allEmails)
-      : { data: [{ id: (user as any).id, email: user.email } as any] }
+    const { data: usersForEmails } = await admin
+      .from('users')
+      .select('id,email')
+      .in('email', allEmails)
 
     const emailToUserId = new Map<string, string>()
     for (const u of usersForEmails || []) emailToUserId.set(u.email, u.id)
 
     const tokenRows: Record<string, { access_token: string; expires_at: string | null }> = {}
     if ((usersForEmails || []).length) {
-      if (useServiceRole) {
-        const { data: rows } = await admin
-          .from('google_tokens')
-          .select('user_id,access_token,expires_at')
-          .in('user_id', (usersForEmails || []).map(u => u.id))
-        for (const r of rows || []) tokenRows[r.user_id] = { access_token: r.access_token, expires_at: r.expires_at as any }
-      } else {
-        // Without service role, we can only use the current user's token (already loaded in selfToken)
-        tokenRows[(user as any).id] = { access_token: selfToken?.access_token, expires_at: selfToken?.expires_at as any }
-      }
+      const { data: rows } = await admin
+        .from('google_tokens')
+        .select('user_id,access_token,expires_at')
+        .in('user_id', (usersForEmails || []).map(u => u.id))
+      for (const r of rows || []) tokenRows[r.user_id] = { access_token: r.access_token, expires_at: r.expires_at as any }
     }
 
     // Refresh expiring tokens (5 min buffer) and build services
@@ -117,7 +95,7 @@ export async function POST(request: NextRequest) {
       const now = Date.now() / 1000
       if (!tok || (exp && exp < now + 300)) {
         try {
-          const refreshed = useServiceRole ? await refreshGoogleAccessToken(uid) : null
+          const refreshed = await refreshGoogleAccessToken(uid)
           if (refreshed?.access_token) {
             tok = refreshed.access_token
             tokenRows[uid] = { access_token: tok, expires_at: new Date(refreshed.expires_at * 1000).toISOString() as any }
@@ -143,8 +121,9 @@ export async function POST(request: NextRequest) {
     try {
       for (const email of allEmails) {
         const svc = services[email]
-        const fb = await svc.getFreeBusyInfo(now.toISOString(), endDate.toISOString(), [email])
-        busyMap[email] = fb[email] || []
+        const fb = await svc.getFreeBusyInfo(now.toISOString(), endDate.toISOString(), ['primary'])
+        const key = Object.keys(fb)[0] || 'primary'
+        busyMap[email] = fb[key] || []
       }
     } catch (e: any) {
       return NextResponse.json({

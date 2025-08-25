@@ -42,7 +42,7 @@ export class GoogleCalendarService {
   async getFreeBusyInfo(
     timeMin: string,
     timeMax: string,
-    emails: string[]
+    calendarIds: string[]
   ): Promise<Record<string, BusyTime[]>> {
     try {
       const url = 'https://www.googleapis.com/calendar/v3/freeBusy';
@@ -56,7 +56,7 @@ export class GoogleCalendarService {
           timeMin,
           timeMax,
           timeZone: 'UTC',
-          items: emails.map((email) => ({ id: email })),
+          items: calendarIds.map((id) => ({ id })),
         }),
       });
 
@@ -68,9 +68,9 @@ export class GoogleCalendarService {
 
       const busyTimes: Record<string, BusyTime[]> = {};
       const calendars = (json as any)?.calendars || {};
-      for (const email of emails) {
-        const calendar = calendars[email];
-        busyTimes[email] = (calendar?.busy || []).map((period: any) => ({ start: period.start, end: period.end }));
+      for (const id of calendarIds) {
+        const calendar = calendars[id];
+        busyTimes[id] = (calendar?.busy || []).map((period: any) => ({ start: period.start, end: period.end }));
       }
       return busyTimes;
     } catch (error: any) {
