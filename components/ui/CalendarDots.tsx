@@ -1,8 +1,7 @@
 'use client'
 
 import * as React from 'react'
-import { DayPicker } from 'react-day-picker'
-import 'react-day-picker/dist/style.css'
+import { Calendar as ShadcnCalendar } from './calendar'
 
 type MeetingsByDay = Record<string, number>
 
@@ -14,19 +13,14 @@ function util_toDayKey(date: Date) {
 // Month calendar with small red dots indicating meetings per day
 export function CalendarDots({ month, onSelect, meetingsByDay, onMonthChange }: { month: Date; onSelect: (d: Date) => void; meetingsByDay: MeetingsByDay; onMonthChange?: (m: Date) => void }) {
   return (
-    <DayPicker
+    <ShadcnCalendar
       mode="single"
       month={month}
       onMonthChange={onMonthChange}
       onDayClick={(d) => onSelect(d)}
       showOutsideDays
       weekStartsOn={0}
-      className="rounded-lg border border-[color:var(--border)] bg-[var(--card)] text-[var(--card-foreground)]"
-      classNames={{
-        day: 'relative grid place-items-center h-10 w-10 sm:h-11 sm:w-11 p-0 text-center hover:bg-[color:var(--muted)]/40 rounded-md',
-        day_today: 'ring-1 ring-[color:var(--primary)]',
-        day_selected: 'bg-[var(--primary)] text-[var(--primary-foreground)]',
-      }}
+      className="rounded-lg"
       components={{
         Day: (props) => {
           const key = util_toDayKey(props.date)
