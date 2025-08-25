@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
-import { createClient } from '@supabase/supabase-js'
 import { Database } from '@/types/database.types'
 import { getCalendarServiceWithToken } from '@/lib/google-calendar'
+import { getGoogleAccessTokenForUser } from '@/lib/auth-supabase'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -22,20 +22,16 @@ export async function GET(request: NextRequest) {
     if (!start || !end) return NextResponse.json({ error: 'Missing start/end' }, { status: 400 })
     console.log('[events] range', { start, end })
 
-    // Service-role to get token
-    const admin = createClient<Database>(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!,
-      { auth: { persistSession: false } }
-    )
-    const { data: tok } = await admin
-      .from('google_tokens')
-      .select('access_token')
-      .eq('user_id', (user as any).id)
-      .single()
-    if (!tok?.access_token) return NextResponse.json({ error: 'No calendar access' }, { status: 403 })
+    // Get valid access token (with automatic refresh)
+    const accessToken = await getGoogleAccessTokenForUser((user as any).id)
+    if (!accessToken) {
+      return NextResponse.json({ 
+        error: 'No calendar access - please reconnect your Google Calendar',
+        requiresReauth: true 
+      }, { status: 403 })
+    }
 
-    const svc = getCalendarServiceWithToken(tok.access_token)
+    const svc = getCalendarServiceWithToken(accessToken)
     const debug = request.nextUrl.searchParams.get('debug') === '1'
     let list = [] as any[]
     try {

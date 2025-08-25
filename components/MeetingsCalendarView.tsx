@@ -107,7 +107,7 @@ export function MeetingsCalendarView() {
         onSelect={setSelectedDate}
         onDayClick={handleDateClick}
         meetingsByDay={meetingsByDay}
-        className="rounded-lg border shadow-sm"
+        className="rounded-lg shadow-sm"
         captionLayout="dropdown"
       />
 

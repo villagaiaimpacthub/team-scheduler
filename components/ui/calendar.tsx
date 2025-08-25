@@ -27,7 +27,7 @@ export function Calendar({
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn(
-        "bg-background group/calendar p-3 [--cell-size:2.5rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
+        "bg-background group/calendar p-4 mb-4 border rounded-lg [--cell-size:2.5rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
         className
       )}
       captionLayout={captionLayout}
@@ -165,11 +165,14 @@ export function Calendar({
                 "data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground",
                 "data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground",
                 "data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground",
-                "hover:bg-accent hover:text-accent-foreground",
-                "transition-colors",
+                "hover:bg-blue-100 hover:text-blue-900 dark:hover:bg-blue-900 dark:hover:text-blue-100",
+                "focus:bg-blue-100 focus:text-blue-900 dark:focus:bg-blue-900 dark:focus:text-blue-100",
+                "transition-all duration-200 ease-in-out",
+                "hover:scale-105 active:scale-95",
                 "flex aspect-square size-[--cell-size] w-full min-w-[--cell-size] flex-col items-center justify-center",
-                "rounded-md font-normal text-sm leading-none",
-                "relative",
+                "rounded-md font-normal text-sm leading-none cursor-pointer",
+                "relative border border-transparent hover:border-blue-200 dark:hover:border-blue-700",
+                "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100",
                 defaultClassNames.day,
                 props.className
               )}

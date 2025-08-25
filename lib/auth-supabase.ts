@@ -226,6 +226,20 @@ export async function refreshGoogleAccessToken(userId: string): Promise<{
     const refreshedTokens = await response.json();
 
     if (!response.ok) {
+      console.error("Token refresh failed:", {
+        status: response.status,
+        error: refreshedTokens.error,
+        description: refreshedTokens.error_description,
+        userId
+      });
+      
+      // If refresh token is invalid, user needs to re-authenticate
+      if (refreshedTokens.error === 'invalid_grant' || response.status === 400) {
+        console.error("Refresh token invalid for user", userId, "- user needs to re-authenticate");
+        // Delete invalid tokens to force re-auth
+        await supabase.from("google_tokens").delete().eq("user_id", userId);
+      }
+      
       throw new Error(refreshedTokens.error || "Token refresh failed");
     }
 
@@ -239,12 +253,13 @@ export async function refreshGoogleAccessToken(userId: string): Promise<{
       expiresAt,
     });
 
+    console.log("Successfully refreshed token for user:", userId);
     return {
       access_token: refreshedTokens.access_token,
       expires_at: expiresAt,
     };
   } catch (error) {
-    console.error("Error refreshing Google access token:", error);
+    console.error("Error refreshing Google access token for user", userId, ":", error);
     return null;
   }
 }
@@ -275,6 +290,49 @@ export async function getGoogleAccessToken(): Promise<string | null> {
     const refreshedToken = await refreshGoogleAccessToken(user.id);
     if (refreshedToken) {
       return refreshedToken.access_token;
+    }
+  }
+
+  return null;
+}
+
+/**
+ * Get a valid Google access token for a specific user ID
+ * Automatically refreshes if expired - for use in API routes
+ */
+export async function getGoogleAccessTokenForUser(userId: string): Promise<string | null> {
+  const supabase = await createSupabaseServerClient();
+
+  // Get current token data
+  const { data: tokenData, error } = await supabase
+    .from("google_tokens")
+    .select("access_token, expires_at, refresh_token")
+    .eq("user_id", userId)
+    .single();
+
+  if (error || !tokenData) {
+    console.log("No token data found for user:", userId);
+    return null;
+  }
+
+  // Check if current token is valid
+  if (tokenData.access_token && tokenData.expires_at) {
+    const now = Math.floor(Date.now() / 1000);
+    const expiresAt = new Date(tokenData.expires_at).getTime() / 1000;
+
+    // If token is still valid (with 5 minute buffer), return it
+    if (expiresAt > now + 300) {
+      return tokenData.access_token;
+    }
+
+    // Token is expired or close to expiring, refresh it
+    console.log("Token expired for user", userId, "- attempting refresh");
+    const refreshedToken = await refreshGoogleAccessToken(userId);
+    if (refreshedToken) {
+      console.log("Token refreshed successfully for user:", userId);
+      return refreshedToken.access_token;
+    } else {
+      console.error("Failed to refresh token for user:", userId);
     }
   }
 
