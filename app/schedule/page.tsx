@@ -13,8 +13,6 @@ export default function SchedulePage() {
   const [loading, setLoading] = useState(false)
   const [slots, setSlots] = useState<Slot[]>([])
   const [selectedSlot, setSelectedSlot] = useState<Slot | null>(null)
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
   const [notes, setNotes] = useState('')
   const [confirmed, setConfirmed] = useState<any | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -35,7 +33,7 @@ export default function SchedulePage() {
       // Simplified demo: request availability for current user only
       const res = await fetch('/api/availability?debug=1', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ emails: [], duration: 30, daysToCheck: 3 })
+        body: JSON.stringify({ emails: [], duration: 30, daysToCheck: 14 })
       })
       if (!res.ok) {
         const j = await res.json().catch(() => ({}))
@@ -50,6 +48,15 @@ export default function SchedulePage() {
       setLoading(false)
     }
   }
+
+  // Auto-load times whenever the selected date changes
+  React.useEffect(() => {
+    if (date) {
+      setSelectedSlot(null)
+      findTimes()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [date])
 
   const book = async () => {
     if (!selectedSlot) return
@@ -93,41 +100,37 @@ export default function SchedulePage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-6 grid md:grid-cols-2 gap-6">
-      <div className="rounded-lg border p-6 bg-[rgb(var(--card))] text-[rgb(var(--card-foreground))] border-[rgb(var(--border))]">
-        <h2 className="text-2xl font-bold">30 Minute Meeting</h2>
-        <div className="mt-4 space-y-3 text-sm text-[rgb(var(--muted-foreground))]">
-          <div className="flex items-center gap-2"><Icon name="Clock" className="h-4 w-4" /> 30 min</div>
-          <div className="flex items-center gap-2"><Icon name="Video" className="h-4 w-4" /> Web conferencing details provided upon confirmation.</div>
-        </div>
-      </div>
-      <div>
-        <h3 className="text-xl font-semibold mb-4">Select a Date & Time</h3>
-        <Card>
-          <div className="p-4">
-            <Calendar mode="single" selected={date} onSelect={setDate} className="rounded-md" />
-            <div className="mt-4">
-              <div className="text-sm text-[rgb(var(--muted-foreground))] mb-2">Time zone</div>
-              <div className="flex items-center gap-2 text-sm"><Icon name="Globe" className="h-4 w-4" /> {Intl.DateTimeFormat().resolvedOptions().timeZone}</div>
-            </div>
+    <div className="max-w-3xl mx-auto p-6">
+      <h3 className="text-xl font-semibold mb-4">Select a Date & Time</h3>
+      <Card>
+        <div className="p-4">
+          <Calendar mode="single" selected={date} onSelect={setDate} className="rounded-md" />
+          <div className="mt-4">
+            <div className="text-sm text-[rgb(var(--muted-foreground))] mb-2">Time zone</div>
+            <div className="flex items-center gap-2 text-sm"><Icon name="Globe" className="h-4 w-4" /> {Intl.DateTimeFormat().resolvedOptions().timeZone}</div>
           </div>
-        </Card>
+        </div>
+      </Card>
 
-        <div className="mt-4">
-          {error && <div className="p-3 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--card))] text-[rgb(var(--muted-foreground))]">{error}</div>}
-          <div className="grid gap-2 md:grid-cols-3 mt-2">
+      <div className="mt-4">
+        {error && <div className="p-3 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--card))] text-[rgb(var(--muted-foreground))]">{error}</div>}
+        {loading ? (
+          <div className="p-6 text-center text-sm text-[rgb(var(--muted-foreground))]">Loading times…</div>
+        ) : (
+          <div className="grid gap-2 sm:grid-cols-3">
             {slots.map((s, i) => (
               <button key={i} onClick={() => setSelectedSlot(s)} className={`rounded-md border px-4 py-3 text-center ${selectedSlot?.start === s.start ? 'bg-[rgb(var(--primary))] text-[rgb(var(--primary-foreground))]' : 'bg-[rgb(var(--background))] text-[rgb(var(--foreground))]' } border-[rgb(var(--border))]`}>
                 {new Date(s.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </button>
             ))}
           </div>
+        )}
 
-          <div className="mt-4 flex gap-2">
-            <Button onClick={findTimes} disabled={!date || loading} className="flex-1">{loading ? 'Loading…' : 'Load Times'}</Button>
-            <Button onClick={book} disabled={!selectedSlot || loading} className="flex-1">Next</Button>
+        {selectedSlot && (
+          <div className="mt-4 flex justify-end">
+            <Button onClick={book} disabled={loading}>Next</Button>
           </div>
-        </div>
+        )}
       </div>
     </div>
   )
