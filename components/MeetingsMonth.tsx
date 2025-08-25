@@ -68,28 +68,32 @@ export function MeetingsMonth() {
 
       <Card>
         <div className="p-4 space-y-2">
-          {selectedDay ? (
-            <div className="text-sm text-[var(--muted-foreground)]">
-              {format(selectedDay, 'EEEE, MMM d, yyyy')}
-            </div>
-          ) : (
-            <div className="text-sm text-[var(--muted-foreground)]">Select a day to see meetings</div>
-          )}
+          <h3 className="text-lg font-semibold">
+            {selectedDay ? (
+              `Meetings for ${format(selectedDay, 'EEEE, MMM d, yyyy')}`
+            ) : (
+              'Select a day to see meetings'
+            )}
+          </h3>
 
           {dayEvents.length === 0 ? (
-            <div className="text-sm">No meetings</div>
+            <div className="text-center py-6">
+              <div className="text-sm text-[var(--muted-foreground)]">
+                {selectedDay ? 'No meetings scheduled for this day' : 'Click on a date to view meetings'}
+              </div>
+            </div>
           ) : (
-            <ul className="divide-y divide-[color:var(--border)]">
+            <div className="space-y-3">
               {dayEvents.map((e) => (
-                <li key={e.id} className="py-2">
+                <div key={e.id} className="border rounded-lg p-3 hover:bg-accent/50 transition-colors">
                   <div className="text-sm font-medium">{e.title}</div>
-                  <div className="text-xs text-[var(--muted-foreground)]">
+                  <div className="text-xs text-[var(--muted-foreground)] mt-1">
                     {e.start ? format(new Date(e.start), 'h:mm a') : ''}
                     {e.end ? ` – ${format(new Date(e.end), 'h:mm a')}` : ''}
                   </div>
-                </li>
+                </div>
               ))}
-            </ul>
+            </div>
           )}
         </div>
       </Card>

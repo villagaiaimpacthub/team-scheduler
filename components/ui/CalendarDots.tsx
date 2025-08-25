@@ -11,34 +11,43 @@ function util_toDayKey(date: Date) {
 }
 
 // Month calendar with small red dots indicating meetings per day
-export function CalendarDots({ month, onSelect, meetingsByDay, onMonthChange }: { month: Date; onSelect: (d: Date) => void; meetingsByDay: MeetingsByDay; onMonthChange?: (m: Date) => void }) {
+export function CalendarDots({ 
+  month, 
+  onSelect, 
+  meetingsByDay, 
+  onMonthChange 
+}: { 
+  month: Date; 
+  onSelect: (d: Date) => void; 
+  meetingsByDay: MeetingsByDay; 
+  onMonthChange?: (m: Date) => void 
+}) {
+  const [selectedDate, setSelectedDate] = React.useState<Date | undefined>(undefined)
+
+  const handleSelect = (date: Date | undefined) => {
+    setSelectedDate(date)
+    if (date) {
+      onSelect(date)
+    }
+  }
+
+  const handleDayClick = (date: Date) => {
+    handleSelect(date)
+  }
+
   return (
     <ShadcnCalendar
       mode="single"
+      selected={selectedDate}
+      onSelect={handleSelect}
+      onDayClick={handleDayClick}
       month={month}
       onMonthChange={onMonthChange}
-      onDayClick={(d) => onSelect(d)}
+      meetingsByDay={meetingsByDay}
       showOutsideDays
       weekStartsOn={0}
-      className="rounded-lg"
-      components={{
-        Day: (props) => {
-          const key = util_toDayKey(props.date)
-          const count = meetingsByDay[key] || 0
-          return (
-            <button {...props.buttonProps} className={props.className}>
-              <span className="text-sm leading-none">{props.date.getDate()}</span>
-              {count > 0 && (
-                <span className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex gap-0.5">
-                  {Array.from({ length: Math.min(count, 3) }).map((_, i) => (
-                    <span key={i} className="h-1 w-1 sm:h-1.5 sm:w-1.5 rounded-full bg-red-500" />
-                  ))}
-                </span>
-              )}
-            </button>
-          )
-        }
-      }}
+      className="rounded-lg border shadow-sm"
+      captionLayout="dropdown"
     />
   )
 }
