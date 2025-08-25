@@ -24,7 +24,7 @@ export function Calendar({ className, ...props }: CalendarProps) {
         head_cell: 'text-[rgb(var(--muted-foreground))] rounded-md w-9 font-normal text-[0.8rem]',
         row: 'flex w-full mt-2',
         cell: 'h-9 w-9 text-center text-sm p-0 relative',
-        day: 'h-9 w-9 p-0 font-normal',
+        day: 'h-9 w-9 p-0 font-normal rounded-full transition-colors hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black',
         day_selected: 'bg-[rgb(var(--primary))] text-[rgb(var(--primary-foreground))] hover:bg-[rgb(var(--primary))] hover:text-[rgb(var(--primary-foreground))] focus:bg-[rgb(var(--primary))] focus:text-[rgb(var(--primary-foreground))] rounded-md',
         day_today: 'rounded-md ring-1 ring-[rgb(var(--primary))] text-[rgb(var(--foreground))]',
         day_outside: 'text-[rgb(var(--muted-foreground))] opacity-60',
