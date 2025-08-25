@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import { Calendar } from '@/components/ui/calendar'
 import { Button } from '@/components/ui/Button'
 import { Card } from '@/components/ui/Card'
@@ -50,7 +50,7 @@ export default function SchedulePage() {
   }
 
   // Auto-load times whenever the selected date changes
-  React.useEffect(() => {
+  useEffect(() => {
     if (date) {
       setSelectedSlot(null)
       findTimes()
