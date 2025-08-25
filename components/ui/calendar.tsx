@@ -27,7 +27,7 @@ export function Calendar({
     <DayPicker
       showOutsideDays={showOutsideDays}
       className={cn(
-        "bg-background group/calendar p-4 mb-4 border rounded-lg [--cell-size:2.5rem] [[data-slot=card-content]_&]:bg-transparent [[data-slot=popover-content]_&]:bg-transparent",
+        "bg-card border rounded-lg shadow-sm p-6 [--cell-size:3rem] w-fit mx-auto",
         className
       )}
       captionLayout={captionLayout}
@@ -39,12 +39,12 @@ export function Calendar({
       classNames={{
         root: cn("w-fit", defaultClassNames.root),
         months: cn(
-          "flex gap-4 flex-col md:flex-row relative",
+          "flex flex-col relative",
           defaultClassNames.months
         ),
-        month: cn("flex flex-col w-full gap-4", defaultClassNames.month),
+        month: cn("flex flex-col gap-4", defaultClassNames.month),
         nav: cn(
-          "flex items-center justify-between w-full absolute top-0 inset-x-0 px-2",
+          "flex items-center justify-between w-full relative mb-4",
           defaultClassNames.nav
         ),
         button_previous: cn(
@@ -56,7 +56,7 @@ export function Calendar({
           defaultClassNames.button_next
         ),
         month_caption: cn(
-          "flex items-center justify-center h-[--cell-size] w-full px-[--cell-size]",
+          "flex items-center justify-center h-[--cell-size] flex-1",
           defaultClassNames.month_caption
         ),
         dropdowns: cn(
@@ -76,12 +76,12 @@ export function Calendar({
           defaultClassNames.caption_label
         ),
         table: "w-full border-collapse",
-        weekdays: cn("flex", defaultClassNames.weekdays),
+        weekdays: cn("grid grid-cols-7 mb-2", defaultClassNames.weekdays),
         weekday: cn(
-          "text-muted-foreground rounded-md flex-1 font-normal text-[0.8rem] select-none h-[--cell-size] flex items-center justify-center",
+          "text-muted-foreground font-medium text-sm h-10 flex items-center justify-center",
           defaultClassNames.weekday
         ),
-        week: cn("flex w-full mt-2", defaultClassNames.week),
+        week: cn("grid grid-cols-7", defaultClassNames.week),
         day: cn(
           "relative w-full h-full p-0 text-center aspect-square select-none",
           defaultClassNames.day
@@ -161,21 +161,17 @@ export function Calendar({
               data-range-end={modifiers.range_end}
               data-range-middle={modifiers.range_middle}
               className={cn(
-                // Selected state - outline circle
-                "data-[selected-single=true]:bg-transparent data-[selected-single=true]:text-foreground data-[selected-single=true]:ring-2 data-[selected-single=true]:ring-primary",
-                "data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground",
-                "data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground",
-                "data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground",
-                // Hover state - white/black circle background
-                "hover:bg-foreground hover:text-background dark:hover:bg-background dark:hover:text-foreground",
-                "focus:bg-foreground focus:text-background dark:focus:bg-background dark:focus:text-foreground",
-                "transition-all duration-150 ease-in-out",
-                "flex aspect-square size-[--cell-size] w-full min-w-[--cell-size] flex-col items-center justify-center",
-                "rounded-full font-normal text-sm leading-none cursor-pointer",
-                "relative",
-                "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent",
-                // Ensure hover effects don't apply to selected state
-                "data-[selected-single=true]:hover:bg-transparent data-[selected-single=true]:hover:text-foreground",
+                // Base styles
+                "h-12 w-full flex flex-col items-center justify-center rounded-lg text-sm font-medium cursor-pointer transition-all duration-200",
+                "relative border border-transparent",
+                // Hover state
+                "hover:bg-accent hover:text-accent-foreground hover:border-border",
+                // Selected state
+                "data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground data-[selected-single=true]:border-primary",
+                // Today
+                "aria-[current=date]:bg-accent aria-[current=date]:text-accent-foreground aria-[current=date]:font-semibold",
+                // Outside month
+                "aria-[disabled=true]:opacity-30 aria-[disabled=true]:cursor-default aria-[disabled=true]:hover:bg-transparent",
                 defaultClassNames.day,
                 props.className
               )}
@@ -185,7 +181,7 @@ export function Calendar({
               {meetingCount > 0 && (
                 <div className="absolute bottom-1 left-1/2 -translate-x-1/2 flex gap-0.5">
                   {Array.from({ length: Math.min(meetingCount, 3) }).map((_, i) => (
-                    <div key={i} className="h-1 w-1 rounded-full bg-red-500" />
+                    <div key={i} className="h-1.5 w-1.5 rounded-full bg-red-500" />
                   ))}
                 </div>
               )}

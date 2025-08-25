@@ -37,19 +37,57 @@ export function MeetingsCalendarView() {
   const fetchMeetings = async () => {
     try {
       setLoading(true)
-      const response = await fetch('/api/meetings', {
+      setError(null)
+      
+      console.log('[MeetingsCalendarView] Fetching events from Google Calendar API...')
+      
+      // Get events for the next 3 months
+      const now = new Date()
+      const endDate = new Date(now.getFullYear(), now.getMonth() + 3, now.getDate())
+      
+      const params = new URLSearchParams({
+        start: now.toISOString(),
+        end: endDate.toISOString(),
+        debug: '1'
+      })
+      
+      const response = await fetch(`/api/events?${params}`, {
         credentials: 'include',
         cache: 'no-store'
       })
       
+      console.log('[MeetingsCalendarView] API response status:', response.status)
+      
       if (!response.ok) {
-        throw new Error('Failed to fetch meetings')
+        const errorText = await response.text()
+        console.error('[MeetingsCalendarView] API error:', errorText)
+        throw new Error(`Failed to fetch events: ${response.status} ${errorText}`)
       }
       
       const data = await response.json()
-      setMeetings(data.meetings || [])
+      console.log('[MeetingsCalendarView] API response data:', data)
+      
+      // Convert events to meeting format
+      const eventsData = data.events || []
+      const meetingsData = eventsData.map((event: any) => ({
+        id: event.id,
+        title: event.title || 'Untitled Event',
+        description: event.description || '',
+        startTime: event.start,
+        endTime: event.end,
+        duration: Math.round((new Date(event.end).getTime() - new Date(event.start).getTime()) / (1000 * 60)),
+        location: event.location || '',
+        organizer: { name: 'You', email: 'you@example.com' },
+        participants: [],
+        googleEventId: event.id,
+        createdAt: new Date().toISOString()
+      }))
+      
+      console.log('[MeetingsCalendarView] Converted to meetings format:', meetingsData.length, 'meetings')
+      
+      setMeetings(meetingsData)
     } catch (error) {
-      console.error('Error fetching meetings:', error)
+      console.error('[MeetingsCalendarView] Error fetching meetings:', error)
       setError(error instanceof Error ? error.message : 'Failed to load meetings')
     } finally {
       setLoading(false)
@@ -100,25 +138,29 @@ export function MeetingsCalendarView() {
   }
 
   return (
-    <div className="space-y-6">
-      <Calendar
-        mode="single"
-        selected={selectedDate}
-        onSelect={setSelectedDate}
-        onDayClick={handleDateClick}
-        meetingsByDay={meetingsByDay}
-        className="rounded-lg shadow-sm"
-        captionLayout="dropdown"
-      />
+    <div className="max-w-4xl mx-auto space-y-8">
+      <div className="flex justify-center">
+        <Calendar
+          mode="single"
+          selected={selectedDate}
+          onSelect={setSelectedDate}
+          onDayClick={handleDateClick}
+          meetingsByDay={meetingsByDay}
+          captionLayout="dropdown"
+        />
+      </div>
 
-      <Card>
-        <div className="p-4">
-          <h3 className="text-lg font-semibold mb-4">
-            {selectedDate 
-              ? `Meetings for ${format(selectedDate, 'EEEE, MMM d, yyyy')}`
-              : 'Select a date to view meetings'
-            }
-          </h3>
+      <Card className="border-0 shadow-lg">
+        <div className="p-6">
+          <div className="flex items-center gap-3 mb-6">
+            <Icon name="Calendar" className="h-5 w-5 text-primary" />
+            <h3 className="text-xl font-semibold">
+              {selectedDate 
+                ? `Meetings for ${format(selectedDate, 'EEEE, MMM d, yyyy')}`
+                : 'Select a date to view meetings'
+              }
+            </h3>
+          </div>
 
           {selectedDateMeetings.length === 0 ? (
             <div className="text-center py-8">
