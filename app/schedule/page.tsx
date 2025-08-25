@@ -109,22 +109,23 @@ export default function SchedulePage() {
             <div className="text-sm text-[rgb(var(--muted-foreground))] mb-2">Time zone</div>
             <div className="flex items-center gap-2 text-sm"><Icon name="Globe" className="h-4 w-4" /> {Intl.DateTimeFormat().resolvedOptions().timeZone}</div>
           </div>
+          <div className="mt-4">
+            {error && <div className="p-3 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--card))] text-[rgb(var(--muted-foreground))]">{error}</div>}
+            {loading && <div className="p-6 text-center text-sm text-[rgb(var(--muted-foreground))]">Loading times…</div>}
+            <div className="grid gap-2 grid-cols-2 sm:grid-cols-3">
+              {slots.map((s, i) => (
+                <button key={i} onClick={() => setSelectedSlot(s)} className={`rounded-md border px-4 py-3 text-center transition-colors ${selectedSlot?.start === s.start ? 'bg-[rgb(var(--primary))] text-[rgb(var(--primary-foreground))] border-[rgb(var(--primary))]' : 'bg-[rgb(var(--background))] text-[rgb(var(--foreground))] border-[rgb(var(--border))] hover:bg-[rgb(var(--muted))]'} }`}>
+                  {new Date(s.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </Card>
 
-      <div className="mt-4">
-        {error && <div className="p-3 rounded-lg border border-[rgb(var(--border))] bg-[rgb(var(--card))] text-[rgb(var(--muted-foreground))]">{error}</div>}
-        {loading && <div className="p-6 text-center text-sm text-[rgb(var(--muted-foreground))]">Loading times…</div>}
-        <div className="grid gap-2 grid-cols-2 sm:grid-cols-3">
-          {slots.map((s, i) => (
-            <button key={i} onClick={() => setSelectedSlot(s)} className={`rounded-md border px-4 py-3 text-center ${selectedSlot?.start === s.start ? 'bg-[rgb(var(--primary))] text-[rgb(var(--primary-foreground))]' : 'bg-[rgb(var(--background))] text-[rgb(var(--foreground))]' } border-[rgb(var(--border))]`}>
-              {new Date(s.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-            </button>
-          ))}
-        </div>
-
-        <div className="h-14"></div>
-        <div className="fixed left-0 right-0 bottom-0 z-40 p-3 bg-[rgb(var(--background))] border-t border-[rgb(var(--border))] sm:static sm:p-0 sm:border-0">
+      <div className="h-16"></div>
+      <div className="fixed left-0 right-0 bottom-0 z-40 p-3 pb-6 bg-[rgb(var(--background))]/90 backdrop-blur border-t border-[rgb(var(--border))] sm:static sm:p-0 sm:border-0">
+        <div className="max-w-xl mx-auto">
           <Button onClick={book} disabled={!selectedSlot || loading} className="w-full sm:w-auto sm:float-right">{loading ? 'Booking…' : 'Next'}</Button>
         </div>
       </div>
