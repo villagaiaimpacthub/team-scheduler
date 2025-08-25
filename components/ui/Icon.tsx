@@ -11,3 +11,4 @@ export function Icon({ name, ...props }: IconProps) {
   const Cmp = Icons[name] as React.ComponentType<Icons.LucideProps>
   return <Cmp {...props} />
 }
+

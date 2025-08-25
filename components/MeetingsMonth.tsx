@@ -62,6 +62,7 @@ export function MeetingsMonth() {
       <CalendarDots
         month={month}
         meetingsByDay={meetingsByDay}
+        onMonthChange={(m) => setMonth(m)}
         onSelect={(d) => setSelectedDay(d)}
       />
 
