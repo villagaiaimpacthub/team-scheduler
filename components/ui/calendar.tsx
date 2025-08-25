@@ -14,6 +14,7 @@ import { Button, buttonVariants } from "@/components/ui/Button"
 export type CalendarProps = React.ComponentProps<typeof DayPicker> & {
   buttonVariant?: React.ComponentProps<typeof Button>["variant"]
   meetingsByDay?: Record<string, number>
+  availableDays?: Record<string, boolean>
   onDayClick?: (date: Date) => void
 }
 
@@ -26,6 +27,7 @@ function Calendar({
   formatters,
   components,
   meetingsByDay = {},
+  availableDays = {},
   onDayClick,
   ...props
 }: CalendarProps) {
@@ -163,6 +165,7 @@ function Calendar({
           const defaultClassNames = getDefaultClassNames()
           const dayKey = day.date.toISOString().slice(0, 10)
           const meetingCount = meetingsByDay[dayKey] || 0
+          const isAvailable = availableDays[dayKey] || false
 
           const ref = React.useRef<HTMLButtonElement>(null)
           React.useEffect(() => {
@@ -198,6 +201,9 @@ function Calendar({
                     <div key={i} className="h-1 w-1 rounded-full bg-red-500" />
                   ))}
                 </div>
+              )}
+              {isAvailable && (
+                <div className="absolute top-1 right-1 h-2 w-2 rounded-full border border-black dark:border-white" />
               )}
             </Button>
           )

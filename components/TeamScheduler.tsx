@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { TeamMemberSelector } from './TeamMemberSelector'
 import { EmailTeamBuilder } from './EmailTeamBuilder'
-import { AvailabilityChecker } from './AvailabilityChecker'
+import { BookingCalendarView } from './BookingCalendarView'
 import { TimeSlotSelector } from './TimeSlotSelector'
 import { Button } from './ui/Button'
 import { Icon } from './ui/Icon'
@@ -141,9 +141,30 @@ export function TeamScheduler() {
             onAdd={(email) => setManualEmails((prev) => Array.from(new Set([...prev, email])))}
             onRemove={(email) => setManualEmails((prev) => prev.filter((e) => e !== email))}
           />
+
+          {/* Duration Selector */}
+          <div className="rounded-lg border p-4 bg-[var(--card)] text-[var(--card-foreground)] border-[color:var(--border)]">
+            <div className="flex items-center gap-2 mb-3">
+              <Icon name="Clock" className="h-5 w-5" />
+              <h3 className="font-semibold">Meeting Duration</h3>
+            </div>
+            <select
+              value={duration}
+              onChange={(e) => setDuration(Number(e.target.value))}
+              className="w-full px-3 py-2 rounded-lg border border-[var(--border)] bg-[var(--background)] text-[var(--foreground)]"
+            >
+              <option value={15}>15 minutes</option>
+              <option value={30}>30 minutes</option>
+              <option value={45}>45 minutes</option>
+              <option value={60}>1 hour</option>
+              <option value={90}>1.5 hours</option>
+              <option value={120}>2 hours</option>
+            </select>
+          </div>
           
-          <AvailabilityChecker
+          <BookingCalendarView
             selectedEmails={[...new Set([...selectedEmails, ...manualEmails])]}
+            duration={duration}
             onSlotsFound={(slots) => {
               setAvailableSlots(slots)
               setError(null)
@@ -170,7 +191,7 @@ export function TeamScheduler() {
             </div>
           </div>
         )}
-        <div>
+        <div data-section="booking">
           {booking ? (
             <div className="flex items-center justify-center p-8">
               <div className="text-center">
