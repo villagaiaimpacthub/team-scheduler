@@ -10,7 +10,7 @@ export function SignInForm() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        scopes: 'openid email profile https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/calendar.events',
+        scopes: 'openid email profile https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/calendar.freebusy',
         redirectTo: `${window.location.origin}/api/auth/callback`,
         queryParams: {
           access_type: 'offline',

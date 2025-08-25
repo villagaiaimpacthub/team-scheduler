@@ -175,7 +175,7 @@ export async function storeGoogleTokens({
     refresh_token: refreshToken,
     expires_at: expiresAt ? new Date(expiresAt * 1000).toISOString() : null,
     token_type: "Bearer",
-    scope: scope || "https://www.googleapis.com/auth/calendar",
+    scope: scope || "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/calendar.freebusy",
   };
 
   // Upsert the tokens (insert or update if exists)

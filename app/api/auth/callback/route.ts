@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
             accessToken: googleTokens,
             refreshToken: googleRefreshToken || undefined,
             expiresAt: session.expires_at,
-            scope: "https://www.googleapis.com/auth/calendar",
+            scope: "https://www.googleapis.com/auth/calendar https://www.googleapis.com/auth/calendar.events https://www.googleapis.com/auth/calendar.freebusy",
           });
         } catch (error) {
           console.error("Error storing Google tokens:", error);
