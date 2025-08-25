@@ -140,14 +140,16 @@ export function MeetingsCalendarView() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div className="flex justify-center">
-        <Calendar
-          mode="single"
-          selected={selectedDate}
-          onSelect={setSelectedDate}
-          onDayClick={handleDateClick}
-          meetingsByDay={meetingsByDay}
-          captionLayout="dropdown"
-        />
+        <Card className="w-fit">
+          <Calendar
+            mode="single"
+            selected={selectedDate}
+            onSelect={setSelectedDate}
+            onDayClick={handleDateClick}
+            meetingsByDay={meetingsByDay}
+            captionLayout="dropdown"
+          />
+        </Card>
       </div>
 
       <Card className="border-0 shadow-lg">
