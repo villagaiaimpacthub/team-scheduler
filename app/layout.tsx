@@ -16,11 +16,11 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
+    <html lang="en" className="dark">
+      <body className={`${inter.className} bg-[rgb(var(--background))] text-[rgb(var(--foreground))]`}>
         <Providers>
           <Navigation />
-          <main className="min-h-screen bg-gray-50">
+          <main className="min-h-screen">
             {children}
           </main>
         </Providers>

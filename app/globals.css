@@ -6,38 +6,43 @@
   html {
     font-feature-settings: "rlig" 1, "calt" 1;
   }
+  :root {
+    --background: 255 255 255;
+    --foreground: 17 24 39;
+    --card: 255 255 255;
+    --card-foreground: 17 24 39;
+    --muted: 243 244 246;
+    --muted-foreground: 107 114 128;
+    --border: 229 231 235;
+    --ring: 59 130 246;
+    --primary: 37 99 235;
+    --primary-foreground: 255 255 255;
+    --secondary: 31 41 55;
+    --secondary-foreground: 255 255 255;
+  }
+  .dark {
+    --background: 3 7 18;
+    --foreground: 229 231 235;
+    --card: 17 24 39;
+    --card-foreground: 229 231 235;
+    --muted: 31 41 55;
+    --muted-foreground: 156 163 175;
+    --border: 55 65 81;
+    --ring: 59 130 246;
+    --primary: 59 130 246;
+    --primary-foreground: 255 255 255;
+    --secondary: 55 65 81;
+    --secondary-foreground: 229 231 235;
+  }
 }
 
 @layer components {
-  .btn {
-    @apply px-4 py-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2;
-  }
-  
-  .btn-primary {
-    @apply bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
-  }
-  
-  .btn-secondary {
-    @apply bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500;
-  }
-  
-  .btn-success {
-    @apply bg-green-600 text-white hover:bg-green-700 focus:ring-green-500;
-  }
-  
-  .btn-danger {
-    @apply bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
-  }
-  
-  .card {
-    @apply bg-white rounded-lg shadow-md border border-gray-200;
-  }
-  
-  .input {
-    @apply block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500;
-  }
-  
-  .label {
-    @apply block text-sm font-medium text-gray-700 mb-1;
-  }
+  .btn { @apply px-4 py-2 rounded-lg font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2; }
+  .btn-primary { @apply text-[rgb(var(--primary-foreground))] bg-[rgb(var(--primary))] hover:opacity-90 focus:ring-[rgb(var(--ring))]; }
+  .btn-secondary { @apply text-[rgb(var(--secondary-foreground))] bg-[rgb(var(--secondary))] hover:opacity-95 focus:ring-[rgb(var(--ring))]; }
+  .btn-success { @apply bg-green-600 text-white hover:bg-green-700 focus:ring-[rgb(var(--ring))]; }
+  .btn-danger { @apply bg-red-600 text-white hover:bg-red-700 focus:ring-[rgb(var(--ring))]; }
+  .card { @apply rounded-lg shadow-md border border-[rgb(var(--border))] bg-[rgb(var(--card))] text-[rgb(var(--card-foreground))]; }
+  .input { @apply block w-full px-3 py-2 rounded-md shadow-sm border border-[rgb(var(--border))] bg-[rgb(var(--background))] text-[rgb(var(--foreground))] focus:outline-none focus:ring-[rgb(var(--ring))] focus:border-[rgb(var(--ring))]; }
+  .label { @apply block text-sm font-medium mb-1 text-[rgb(var(--muted-foreground))]; }
 }

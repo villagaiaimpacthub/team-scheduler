@@ -50,7 +50,9 @@ export function AvailabilityChecker({ selectedEmails, onSlotsFound, onSuggestion
       })
 
       if (!response.ok) {
-        throw new Error('Failed to check availability')
+        const err = await response.json().catch(() => ({} as any))
+        const msg = err?.hint || err?.error || 'Failed to check availability'
+        throw new Error(msg)
       }
 
       const data: AvailabilityResponse = await response.json()
