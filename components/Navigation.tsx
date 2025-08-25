@@ -24,14 +24,14 @@ export function Navigation() {
 
             <div className="ml-2 sm:ml-6 flex items-center gap-2 sm:gap-4">
               <Link
-                href="/"
+                href="/schedule"
                 className="text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-2 sm:px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1"
               >
                 <Icon name="Clock" className="h-4 w-4" />
                 <span>Schedule</span>
               </Link>
               <Link
-                href="/meetings"
+                href="/schedule"
                 className="text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-2 sm:px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1"
               >
                 <Icon name="Calendar" className="h-4 w-4" />
