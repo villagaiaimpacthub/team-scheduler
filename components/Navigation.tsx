@@ -31,7 +31,7 @@ export function Navigation() {
                 <span>Schedule</span>
               </Link>
               <Link
-                href="/schedule"
+                href="/meetings"
                 className="text-[var(--muted-foreground)] hover:text-[var(--foreground)] px-2 sm:px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1"
               >
                 <Icon name="Calendar" className="h-4 w-4" />

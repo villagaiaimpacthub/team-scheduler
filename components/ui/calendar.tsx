@@ -44,7 +44,7 @@ export function Calendar({
         ),
         month: cn("flex flex-col w-full gap-4", defaultClassNames.month),
         nav: cn(
-          "flex items-center gap-1 w-full absolute top-0 inset-x-0 justify-between",
+          "flex items-center justify-between w-full absolute top-0 inset-x-0 px-2",
           defaultClassNames.nav
         ),
         button_previous: cn(
@@ -93,7 +93,7 @@ export function Calendar({
         range_middle: cn("rounded-none", defaultClassNames.range_middle),
         range_end: cn("rounded-r-md bg-accent", defaultClassNames.range_end),
         today: cn(
-          "bg-accent text-accent-foreground rounded-md data-[selected=true]:rounded-none",
+          "font-semibold text-primary",
           defaultClassNames.today
         ),
         outside: cn(
@@ -161,18 +161,21 @@ export function Calendar({
               data-range-end={modifiers.range_end}
               data-range-middle={modifiers.range_middle}
               className={cn(
-                "data-[selected-single=true]:bg-primary data-[selected-single=true]:text-primary-foreground",
+                // Selected state - outline circle
+                "data-[selected-single=true]:bg-transparent data-[selected-single=true]:text-foreground data-[selected-single=true]:ring-2 data-[selected-single=true]:ring-primary",
                 "data-[range-middle=true]:bg-accent data-[range-middle=true]:text-accent-foreground",
                 "data-[range-start=true]:bg-primary data-[range-start=true]:text-primary-foreground",
                 "data-[range-end=true]:bg-primary data-[range-end=true]:text-primary-foreground",
-                "hover:bg-blue-100 hover:text-blue-900 dark:hover:bg-blue-900 dark:hover:text-blue-100",
-                "focus:bg-blue-100 focus:text-blue-900 dark:focus:bg-blue-900 dark:focus:text-blue-100",
-                "transition-all duration-200 ease-in-out",
-                "hover:scale-105 active:scale-95",
+                // Hover state - white/black circle background
+                "hover:bg-foreground hover:text-background dark:hover:bg-background dark:hover:text-foreground",
+                "focus:bg-foreground focus:text-background dark:focus:bg-background dark:focus:text-foreground",
+                "transition-all duration-150 ease-in-out",
                 "flex aspect-square size-[--cell-size] w-full min-w-[--cell-size] flex-col items-center justify-center",
-                "rounded-md font-normal text-sm leading-none cursor-pointer",
-                "relative border border-transparent hover:border-blue-200 dark:hover:border-blue-700",
-                "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100",
+                "rounded-full font-normal text-sm leading-none cursor-pointer",
+                "relative",
+                "disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent",
+                // Ensure hover effects don't apply to selected state
+                "data-[selected-single=true]:hover:bg-transparent data-[selected-single=true]:hover:text-foreground",
                 defaultClassNames.day,
                 props.className
               )}
