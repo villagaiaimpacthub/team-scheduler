@@ -49,6 +49,7 @@ export class GoogleCalendarService {
         requestBody: {
           timeMin,
           timeMax,
+          timeZone: 'UTC',
           items: emails.map((email) => ({ id: email })),
         },
       });
@@ -65,9 +66,11 @@ export class GoogleCalendarService {
       }
 
       return busyTimes;
-    } catch (error) {
-      console.error("Error fetching free/busy info:", error);
-      throw new Error("Failed to fetch calendar availability");
+    } catch (error: any) {
+      const details = error?.response?.data || error?.message || String(error);
+      console.error("Error fetching free/busy info:", details);
+      // Re-throw with structured details to bubble up to API route
+      throw new Error(typeof details === 'string' ? details : JSON.stringify(details));
     }
   }
 
