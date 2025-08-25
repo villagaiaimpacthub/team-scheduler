@@ -36,7 +36,7 @@ export function AvailabilityChecker({ selectedEmails, onSlotsFound, onSuggestion
       setLoading(true)
       setError(null)
       
-      const response = await fetch('/api/availability', {
+      const response = await fetch('/api/availability?debug=1', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
