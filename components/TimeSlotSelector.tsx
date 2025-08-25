@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Card } from './ui/Card'
-import { Button } from './ui/button'
+import { Button } from './ui/Button'
 import { Icon } from './ui/Icon'
 import { format } from 'date-fns'
 

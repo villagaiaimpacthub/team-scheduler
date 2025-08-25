@@ -5,7 +5,7 @@ import FullCalendar from '@fullcalendar/react'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 import { Card } from './ui/Card'
-import { Button } from './ui/button'
+import { Button } from './ui/Button'
 import { Icon } from './ui/Icon'
 
 interface SelectedEventPayload {

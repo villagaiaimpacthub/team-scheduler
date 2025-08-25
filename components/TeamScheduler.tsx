@@ -5,7 +5,7 @@ import { TeamMemberSelector } from './TeamMemberSelector'
 import { EmailTeamBuilder } from './EmailTeamBuilder'
 import { AvailabilityChecker } from './AvailabilityChecker'
 import { TimeSlotSelector } from './TimeSlotSelector'
-import { Button } from './ui/button'
+import { Button } from './ui/Button'
 import { Icon } from './ui/Icon'
 
 interface TimeSlot {
