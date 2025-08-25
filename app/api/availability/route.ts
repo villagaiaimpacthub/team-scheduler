@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js"
 import { NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { createServerClient } from "@supabase/ssr"
+import { refreshGoogleAccessToken } from "@/lib/auth-supabase"
 import { Database } from "@/types/database.types"
 
 const availabilitySchema = z.object({
@@ -80,11 +81,24 @@ export async function POST(request: NextRequest) {
       for (const r of rows || []) tokenRows[r.user_id] = { access_token: r.access_token, expires_at: r.expires_at as any }
     }
 
+    // Refresh expiring tokens (5 min buffer) and build services
     const missing: string[] = []
     const services: Record<string, ReturnType<typeof getCalendarServiceWithToken>> = {}
     for (const email of allEmails) {
       const uid = emailToUserId.get(email)
-      const tok = uid ? tokenRows[uid]?.access_token : undefined
+      if (!uid) { missing.push(email); continue }
+      let tok = tokenRows[uid]?.access_token
+      const exp = tokenRows[uid]?.expires_at ? new Date(tokenRows[uid]!.expires_at as any).getTime() / 1000 : null
+      const now = Date.now() / 1000
+      if (!tok || (exp && exp < now + 300)) {
+        try {
+          const refreshed = await refreshGoogleAccessToken(uid)
+          if (refreshed?.access_token) {
+            tok = refreshed.access_token
+            tokenRows[uid] = { access_token: tok, expires_at: new Date(refreshed.expires_at * 1000).toISOString() as any }
+          }
+        } catch {}
+      }
       if (!tok) missing.push(email)
       else services[email] = getCalendarServiceWithToken(tok)
     }

@@ -13,12 +13,13 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: 'bg-[var(--primary)] text-[var(--primary-foreground)] hover:opacity-90 focus:ring-[color:var(--ring)]',
-        secondary: 'bg-[var(--secondary)] text-[var(--secondary-foreground)] hover:opacity-95 focus:ring-[color:var(--ring)]',
-        success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-[color:var(--ring)]',
-        danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-[color:var(--ring)]',
-        outline: 'border border-[color:var(--border)] bg-[var(--background)] text-[var(--foreground)] hover:bg-[var(--muted)] focus:ring-[color:var(--ring)]',
-        ghost: 'bg-transparent hover:bg-[var(--muted)]',
+        // Black on light, white on dark
+        default: 'bg-black text-white dark:bg-white dark:text-black hover:opacity-90 focus:ring-[rgb(var(--ring))]',
+        secondary: 'bg-[rgb(var(--secondary))] text-[rgb(var(--secondary-foreground))] hover:opacity-95 focus:ring-[rgb(var(--ring))]',
+        success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-[rgb(var(--ring))]',
+        danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-[rgb(var(--ring))]',
+        outline: 'border border-[rgb(var(--border))] bg-[rgb(var(--background))] text-[rgb(var(--foreground))] hover:bg-[rgb(var(--muted))] focus:ring-[rgb(var(--ring))]',
+        ghost: 'bg-transparent hover:bg-[rgb(var(--muted))] text-[rgb(var(--foreground))]',
       },
       size: {
         sm: 'px-3 py-1.5 text-sm rounded-md',
