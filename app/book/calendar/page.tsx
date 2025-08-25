@@ -103,9 +103,6 @@ export default function CalendarPage() {
     return null
   }
 
-  const availableDaysCount = Object.keys(availableDaysByDate).length
-  const totalSlotsCount = availabilityData.slots.length
-
   return (
     <div className="min-h-screen p-4 bg-[var(--background)] text-[var(--foreground)]">
       <div className="max-w-4xl mx-auto space-y-6">
@@ -118,32 +115,6 @@ export default function CalendarPage() {
           <p className="text-[var(--muted-foreground)]">Choose an available date for your meeting</p>
         </div>
 
-        {/* Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card>
-            <div className="text-center">
-              <Icon name="Users" className="h-6 w-6 mx-auto mb-2 text-[var(--primary)]" />
-              <p className="text-2xl font-bold">{selectedEmails.length + 1}</p>
-              <p className="text-sm text-[var(--muted-foreground)]">Participants</p>
-            </div>
-          </Card>
-          
-          <Card>
-            <div className="text-center">
-              <Icon name="Calendar" className="h-6 w-6 mx-auto mb-2 text-[var(--primary)]" />
-              <p className="text-2xl font-bold">{availableDaysCount}</p>
-              <p className="text-sm text-[var(--muted-foreground)]">Available Days</p>
-            </div>
-          </Card>
-          
-          <Card>
-            <div className="text-center">
-              <Icon name="Clock" className="h-6 w-6 mx-auto mb-2 text-[var(--primary)]" />
-              <p className="text-2xl font-bold">{totalSlotsCount}</p>
-              <p className="text-sm text-[var(--muted-foreground)]">Time Slots</p>
-            </div>
-          </Card>
-        </div>
 
         {/* Calendar */}
         <div className="flex justify-center">
