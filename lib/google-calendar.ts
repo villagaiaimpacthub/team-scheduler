@@ -45,32 +45,38 @@ export class GoogleCalendarService {
     emails: string[]
   ): Promise<Record<string, BusyTime[]>> {
     try {
-      const response = await this.calendar.freebusy.query({
-        requestBody: {
+      const url = 'https://www.googleapis.com/calendar/v3/freeBusy';
+      const res = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${this.accessToken}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
           timeMin,
           timeMax,
           timeZone: 'UTC',
           items: emails.map((email) => ({ id: email })),
-        },
+        }),
       });
 
-      const busyTimes: Record<string, BusyTime[]> = {};
-
-      for (const email of emails) {
-        const calendar = response.data.calendars?.[email];
-        busyTimes[email] =
-          calendar?.busy?.map((period: any) => ({
-            start: period.start,
-            end: period.end,
-          })) || [];
+      const json = await res.json().catch(() => ({} as any));
+      if (!res.ok) {
+        const message = json?.error?.message || json?.error || `Google freeBusy HTTP ${res.status}`;
+        throw new Error(message);
       }
 
+      const busyTimes: Record<string, BusyTime[]> = {};
+      const calendars = (json as any)?.calendars || {};
+      for (const email of emails) {
+        const calendar = calendars[email];
+        busyTimes[email] = (calendar?.busy || []).map((period: any) => ({ start: period.start, end: period.end }));
+      }
       return busyTimes;
     } catch (error: any) {
-      const details = error?.response?.data || error?.message || String(error);
-      console.error("Error fetching free/busy info:", details);
-      // Re-throw with structured details to bubble up to API route
-      throw new Error(typeof details === 'string' ? details : JSON.stringify(details));
+      const details = error?.message || String(error);
+      console.error('Error fetching free/busy info (http):', details);
+      throw new Error(details);
     }
   }
 
